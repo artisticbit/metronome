@@ -26,6 +26,10 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.navigation_metronome:
                     return true;
                 case R.id.navigation_tuner:
+                    Fragment tunerFragment = new tunerFragment();
+                    tunerFragment.setArguments(getIntent().getExtras());
+
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,tunerFragment).commit();
                     return true;
             }
             return false;
