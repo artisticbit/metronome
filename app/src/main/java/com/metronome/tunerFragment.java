@@ -42,8 +42,8 @@ public class tunerFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         //checkPermission();
-        permissionUtil = new PermissionUtil(getActivity());
-        permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);
+        //permissionUtil = new PermissionUtil(getActivity());
+        //permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);
         //audioUtil = new AudioUtil();
         //audioUtil.startRecording();
 
@@ -94,11 +94,14 @@ public class tunerFragment extends Fragment {
                    if( permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO)){
                        Log.d("test","tunerStartBtnClick!");
                        audioUtil = new AudioUtil();
-                       audioUtil.startRecording();
+                       //audioUtil.startAnalyze();
                    }
                 break;
             }
         }
     }
 
+    public void onClickBotton(View view){
+
+    }
 }
