@@ -64,7 +64,7 @@ public class AudioUtil implements Runnable{
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
-
+                //
                }
                 break;
             case AUDIO_MODE_RECORD:
