@@ -69,7 +69,7 @@ public class tunerFragment extends Fragment {
                    if( permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO)){
                        Log.d("test","tunerStartBtnClick!");
                        audioUtil = new AudioUtil();
-                       //audioUtil.startAnalyze();
+                       audioUtil.startAnalyze();
                    }
                 break;
             }

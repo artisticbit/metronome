@@ -49,22 +49,24 @@ public class AudioUtil implements Runnable{
     }
 
     public void startAnalyze(){
-        audioMode = AUDIO_MODE.AUDIO_MODE_ANALYZE;
-        audioRecord.startRecording();
-
-    }
-    public void stopAnlyze(){
+        if(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
+            audioRecord.stop();
+        }else{
+            audioMode = AUDIO_MODE.AUDIO_MODE_ANALYZE;
+            audioRecord.startRecording();
+        }
 
     }
 
     @Override
     public void run() {
-        byte[] buffer = new byte[bufferSize];
-        
+        byte[] readData = new byte[bufferSize];
+
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
-                //
+                    audioRecord.read(readData,0,bufferSize);
+
                }
                 break;
             case AUDIO_MODE_RECORD:
