@@ -41,11 +41,9 @@ public class tunerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //checkPermission();
-        //permissionUtil = new PermissionUtil(getActivity());
-        //permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);
-        //audioUtil = new AudioUtil();
-        //audioUtil.startRecording();
+        //튜너 진입시 퍼시션 체크
+        permissionUtil = new PermissionUtil(getActivity());
+        permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);
 
         View view= inflater.inflate(R.layout.fragment_tuner,null);
         btnOnClickListener = new BtnOnClickListener();
@@ -53,10 +51,6 @@ public class tunerFragment extends Fragment {
         tunerStartBtn = view.findViewById(R.id.tunerStartBtn);
         tunerStartBtn.setOnClickListener(btnOnClickListener);
 
-
-
-        // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_tuner, container, false);
         return view;
 
     }
@@ -65,26 +59,7 @@ public class tunerFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-/*
-    public boolean checkPermission(){
-        int permissionCheck = ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.RECORD_AUDIO);
 
-        Log.d("test","permission :"+permissionCheck);
-        //RECORD_AUDIO 퍼미션없을경우 퍼미션 요청
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            //권한취소이력확인
-            if(this.shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)){
-
-            }else{
-                //권한요청
-                this.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},PERMISSION_CODE_RECORD_AUDIO);
-            }
-        }else{
-            return true;
-        }
-        return false;
-    }
-*/
     //프래그먼트내 버튼클릭이벤트 정의
     class BtnOnClickListener implements Button.OnClickListener{
         @Override
@@ -101,7 +76,4 @@ public class tunerFragment extends Fragment {
         }
     }
 
-    public void onClickBotton(View view){
-
-    }
 }

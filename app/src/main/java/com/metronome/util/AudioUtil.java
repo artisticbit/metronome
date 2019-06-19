@@ -59,9 +59,13 @@ public class AudioUtil implements Runnable{
 
     @Override
     public void run() {
+        byte[] buffer = new byte[bufferSize];
+        
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
-                Log.d("test", "run : thread Test!!!! ");
+               while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
+
+               }
                 break;
             case AUDIO_MODE_RECORD:
                 break;
