@@ -1,0 +1,18 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="Encoding" addBOMForNewFiles="with NO BOM" />
+      <component name="GradleLocalSettings">
+        <option name="projectSyncType">
+          <map>
+            <entry key="$USER_HOME$/AndroidStudioProjects/metronome" value="PREVIEW" />
+          </map>
+        </option>
+      </component>
+      <component name="PropertiesComponent">
+        <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
+        <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+      </component>
+    </defaultProject>
+  </component>
+</application>
