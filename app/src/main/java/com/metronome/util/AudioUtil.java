@@ -12,7 +12,7 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
-public class AudioUtil {
+public class AudioUtil implements Runnable{
 
     private AudioRecord audioRecord;
     private int audioSource = MediaRecorder.AudioSource.MIC;
@@ -21,17 +21,58 @@ public class AudioUtil {
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private int bufferSize = AudioTrack.getMinBufferSize(sampleRate,channelCount,audioFormat);
 
-    //private Activity activity;
+    private AUDIO_MODE audioMode;
+    private enum AUDIO_MODE{
+        AUDIO_MODE_RECORD, AUDIO_MODE_ANALYZE , AUDIO_MODE_PLAY
+    }
+    private Thread thread;
     public AudioUtil(){
-        //this.activity = activity;
+        audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
+        thread = new Thread(this);
+    }
+    public AudioUtil(int audioSource, int sampleRate, int channelCount, int audioFormat, int bufferSize){
+        this.audioSource = audioSource;
+        this.sampleRate = sampleRate;
+        this.channelCount=channelCount;
+        this.audioFormat = audioFormat;
+        this.bufferSize = bufferSize;
+
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
     }
 
-    public void startRecording(){
-
-        Log.d("test","audioUtilInit");
+    public void startRecord(){
         audioRecord.startRecording();
+
+    }
+    public void stopRecord(){
+
     }
 
+    public void startAnalyze(){
+        if(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
+            audioRecord.stop();
+        }else{
+            audioMode = AUDIO_MODE.AUDIO_MODE_ANALYZE;
+            audioRecord.startRecording();
+        }
 
+    }
+
+    @Override
+    public void run() {
+        byte[] readData = new byte[bufferSize];
+
+        switch (audioMode){
+            case AUDIO_MODE_ANALYZE:
+               while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
+                    audioRecord.read(readData,0,bufferSize);
+
+               }
+                break;
+            case AUDIO_MODE_RECORD:
+                break;
+            case AUDIO_MODE_PLAY:
+                break;
+        }
+    }
 }
