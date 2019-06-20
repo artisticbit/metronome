@@ -26,7 +26,7 @@ public class AudioUtil implements Runnable{
 
     private AudioRecord audioRecord;
     private int audioSource = MediaRecorder.AudioSource.MIC;
-    private int sampleRate =    44100;
+    private int sampleRate =    44100;//44100;
     private int channelCount = AudioFormat.CHANNEL_IN_STEREO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private int bufferSize = AudioTrack.getMinBufferSize(sampleRate,channelCount,audioFormat);
@@ -39,13 +39,13 @@ public class AudioUtil implements Runnable{
 
     public ImageView imageView;
     public Bitmap bitmap;
+    public Bitmap bitmapOutput;
     public Canvas canvas;
+    public Canvas canvasOutput;
     public Paint paint;
 
     public AudioUtil(){
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
-        thread = new Thread(this);
-
     }
     public AudioUtil(int audioSource, int sampleRate, int channelCount, int audioFormat, int bufferSize){
         this.audioSource = audioSource;
@@ -72,6 +72,7 @@ public class AudioUtil implements Runnable{
         }else{
             audioMode = AUDIO_MODE.AUDIO_MODE_ANALYZE;
             audioRecord.startRecording();
+            thread=new Thread(this);
             thread.start();
         }
 
@@ -80,7 +81,7 @@ public class AudioUtil implements Runnable{
     @Override
     public void run() {
         byte[] readData = new byte[bufferSize];
-        int blockSize = 256;
+        int blockSize = 512;
         RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
         short[] buffer = new short[blockSize];
         double[] toTransform = new double[blockSize];
@@ -94,7 +95,7 @@ public class AudioUtil implements Runnable{
                    }
                    transfromer.ft(toTransform);
                    //Log.d("test", "run: "+toTransform[0]);
-                   //onProgressUpdate(toTransform);
+                   onProgressUpdate(toTransform);
                }
                 break;
             case AUDIO_MODE_RECORD:
@@ -102,6 +103,8 @@ public class AudioUtil implements Runnable{
             case AUDIO_MODE_PLAY:
                 break;
         }
+
+        Log.d("test", "audioUtil Thread End!!!");
     }
 
 
@@ -109,23 +112,27 @@ public class AudioUtil implements Runnable{
     public void setImageView(ImageView imageView){
         //테스트코드
         this.imageView = imageView;
-        bitmap = Bitmap.createBitmap((int)256, (int)100, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
+        bitmapOutput = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
+        canvasOutput = new Canvas(bitmapOutput);
         paint = new Paint();
         paint.setColor(Color.GREEN);
-        imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(bitmapOutput);
         //
     }
     public void onProgressUpdate(double[]... toTransform) {
 
         canvas.drawColor(Color.BLACK);
-
+        //Log.d("test", "toTransformLength:  "+toTransform[0].length);
         for(int i = 0; i < toTransform[0].length; i++){
             int x = i;
-            int downy = (int) (100 - (toTransform[0][i] * 10));
-            int upy = 100;
+            int downy = (int) (200 - (toTransform[0][i] * 10));
+            int upy = 200;
             canvas.drawLine(x, downy, x, upy, paint);
+
         }
+        canvasOutput.drawBitmap(bitmap ,0,0,null);
         imageView.invalidate();
     }
 }

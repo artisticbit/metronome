@@ -28,7 +28,7 @@ import com.metronome.util.PermissionUtil;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class tunerFragment extends Fragment {
+public class TunerFragment extends Fragment {
 
     private  AudioUtil audioUtil;
     private PermissionUtil permissionUtil;
@@ -37,10 +37,15 @@ public class tunerFragment extends Fragment {
     private  ImageView imageView;
 
     private Button tunerStartBtn;
-    public tunerFragment() {
+    public TunerFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("test", "TunerFragment onCreate!!");
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
