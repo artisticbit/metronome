@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 
 
 import android.view.MenuItem;
-import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity {
    private Fragment metronomeFragment;
@@ -42,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         metronomeFragment = new MetronomeFragment();
-        tunerFragment = new tunerFragment();
+        tunerFragment = new TunerFragment();
 
         if(savedInstanceState!=null) return;
 

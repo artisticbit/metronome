@@ -3,6 +3,10 @@ package com.metronome;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.metronome.util.AudioUtil;
 import com.metronome.util.PermissionUtil;
@@ -23,19 +28,24 @@ import com.metronome.util.PermissionUtil;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class tunerFragment extends Fragment {
+public class TunerFragment extends Fragment {
 
     private  AudioUtil audioUtil;
     private PermissionUtil permissionUtil;
 
     private BtnOnClickListener btnOnClickListener;
-    private int PERMISSION_CODE_RECORD_AUDIO = 1; //나중에 제거
+    private  ImageView imageView;
 
     private Button tunerStartBtn;
-    public tunerFragment() {
+    public TunerFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("test", "TunerFragment onCreate!!");
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,6 +61,8 @@ public class tunerFragment extends Fragment {
         tunerStartBtn = view.findViewById(R.id.tunerStartBtn);
         tunerStartBtn.setOnClickListener(btnOnClickListener);
 
+
+        imageView = view.findViewById(R.id.imageView);
         return view;
 
     }
@@ -68,12 +80,17 @@ public class tunerFragment extends Fragment {
                 case R.id.tunerStartBtn :
                    if( permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO)){
                        Log.d("test","tunerStartBtnClick!");
-                       audioUtil = new AudioUtil();
+                       if(audioUtil==null) {
+                           audioUtil = new AudioUtil();
+                           audioUtil.setImageView(imageView);//
+                       }
                        audioUtil.startAnalyze();
                    }
                 break;
             }
         }
     }
+
+
 
 }
