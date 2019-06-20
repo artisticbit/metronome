@@ -13,8 +13,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity {
-   private Fragment fragment = null;
-
+   private Fragment metronomeFragment;
+   private Fragment tunerFragment;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -24,11 +24,9 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.navigation_recordfile:
                     return true;
                 case R.id.navigation_metronome:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,metronomeFragment).commit();
                     return true;
                 case R.id.navigation_tuner:
-                    Fragment tunerFragment = new tunerFragment();
-                    tunerFragment.setArguments(getIntent().getExtras());
-
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,tunerFragment).commit();
                     return true;
             }
@@ -43,11 +41,12 @@ public class HomeActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        if(savedInstanceState!=null) return;
-        Fragment initFragment = new MetronomeFragment();
-        initFragment.setArguments(getIntent().getExtras());
+        metronomeFragment = new MetronomeFragment();
+        tunerFragment = new tunerFragment();
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,initFragment).commit();
+        if(savedInstanceState!=null) return;
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,metronomeFragment).commit();
 
     }
 
