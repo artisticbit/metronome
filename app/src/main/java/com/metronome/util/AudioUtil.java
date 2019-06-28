@@ -126,6 +126,9 @@ public class AudioUtil implements Runnable{
         canvasOutput = new Canvas(bitmapOutput);
         paint = new Paint();
         paint.setColor(Color.GREEN);
+        paint2 = new Paint();
+        paint2.setColor(Color.WHITE);
+        paint2.setTextSize(20);
         imageView.setImageBitmap(bitmapOutput);
         //
     }
@@ -144,7 +147,7 @@ public class AudioUtil implements Runnable{
             }
         }
 
-        canvas.drawText(toTransform[0][index]+"",0,0,paint);
+        canvas.drawText("Hz :: "+toTransform[0][index],100,100,paint2);
         canvasOutput.drawBitmap(bitmap ,0,0,null);
         imageView.invalidate();
     }
