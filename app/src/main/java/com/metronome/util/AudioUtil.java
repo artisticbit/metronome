@@ -1,9 +1,5 @@
 package com.metronome.util;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,10 +11,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.widget.ImageView;
 
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
-import com.metronome.R;
+import java.util.ArrayDeque;
 
 import ca.uol.aig.fftpack.RealDoubleFFT;
 
@@ -26,8 +19,8 @@ public class AudioUtil implements Runnable{
 
     private AudioRecord audioRecord;
     private int audioSource = MediaRecorder.AudioSource.MIC;
-    private int sampleRate =    44100;//44100;
-    private int channelCount = AudioFormat.CHANNEL_IN_STEREO;
+    private int sampleRate =    16384;//44100;
+    private int channelCount = AudioFormat.CHANNEL_CONFIGURATION_MONO;//AudioFormat.CHANNEL_IN_STEREO;
     private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private int bufferSize = AudioTrack.getMinBufferSize(sampleRate,channelCount,audioFormat);
 
@@ -43,6 +36,7 @@ public class AudioUtil implements Runnable{
     public Canvas canvas;
     public Canvas canvasOutput;
     public Paint paint;
+    public Paint paint2;
 
     public AudioUtil(){
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
@@ -81,19 +75,33 @@ public class AudioUtil implements Runnable{
     @Override
     public void run() {
         byte[] readData = new byte[bufferSize];
-        int blockSize = 512;
+        int blockSize = 8192;
         RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
         short[] buffer = new short[blockSize];
         double[] toTransform = new double[blockSize];
-
+        ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
+        for(int i=0; i<blockSize; i++){
+            deque.add(0.0);
+        }
+        int readSize=1024;
+        Double[] toTransformD = new Double[blockSize];
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
-                   int bufferReadResult = audioRecord.read(buffer,0,blockSize);
-                   for(int i = 0; i < blockSize && i < bufferReadResult; i++){
-                       toTransform[i] = (double)buffer[i] / Short.MAX_VALUE;
+                   //int bufferReadResult = audioRecord.read(buffer,0,blockSize); //blockSize에서 작은사이즈로
+                   int bufferReadResult = audioRecord.read(buffer,0,readSize);
+                   //for(int i = 0; i < blockSize && i < bufferReadResult; i++){
+                   for(int i = 0; i < readSize && i < bufferReadResult; i++){
+                       //toTransform[i] = (double)buffer[i] / Short.MAX_VALUE;
+                       deque.removeFirst();//
+                       deque.addLast((double)buffer[i] / Short.MAX_VALUE);//
                    }
+                   toTransformD = deque.toArray(toTransformD);
+                   for(int i=0; i<blockSize; i++)
+                       toTransform[i] = toTransformD[i];
+
                    transfromer.ft(toTransform);
+
                    //Log.d("test", "run: "+toTransform[0]);
                    onProgressUpdate(toTransform);
                }
@@ -112,8 +120,8 @@ public class AudioUtil implements Runnable{
     public void setImageView(ImageView imageView){
         //테스트코드
         this.imageView = imageView;
-        bitmap = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
-        bitmapOutput = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
+        bitmapOutput = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         canvasOutput = new Canvas(bitmapOutput);
         paint = new Paint();
@@ -122,16 +130,21 @@ public class AudioUtil implements Runnable{
         //
     }
     public void onProgressUpdate(double[]... toTransform) {
-
+        int index=0;
         canvas.drawColor(Color.BLACK);
         //Log.d("test", "toTransformLength:  "+toTransform[0].length);
         for(int i = 0; i < toTransform[0].length; i++){
-            int x = i;
-            int downy = (int) (200 - (toTransform[0][i] * 10));
-            int upy = 200;
+            int x = i/8 ;
+            int downy = (int) (400 - (toTransform[0][i] * 10));
+            int upy = 400;
             canvas.drawLine(x, downy, x, upy, paint);
 
+            if(toTransform[0][index]<toTransform[0][i]){
+                index = i;
+            }
         }
+
+        canvas.drawText(toTransform[0][index]+"",0,0,paint);
         canvasOutput.drawBitmap(bitmap ,0,0,null);
         imageView.invalidate();
     }
