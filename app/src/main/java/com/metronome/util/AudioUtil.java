@@ -12,6 +12,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.metronome.util.tarsos.DynamicWavelet;
+import com.metronome.util.tarsos.PitchDetectionResult;
+import com.metronome.util.tarsos.PitchDetector;
+import com.metronome.util.tarsos.Yin;
+
 import java.util.ArrayDeque;
 
 import ca.uol.aig.fftpack.RealDoubleFFT;
@@ -90,18 +95,25 @@ public class AudioUtil implements Runnable{
     public void run() {
         byte[] readData = new byte[bufferSize];
         int blockSize = 8192;
+        int readSize=1024;
         RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
         short[] buffer = new short[blockSize];
         double[] toTransform = new double[blockSize];
         ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
+
+        //tarsos 라이브러리 사용
+        PitchDetector pitchDetector = new Yin(sampleRate, readSize);
+        PitchDetectionResult pitchDetectionResult;
+        PitchDetector pitchDetector1 = new DynamicWavelet(sampleRate,readSize);
+
         for(int i=0; i<blockSize; i++){
             deque.add(0.0);
         }
-        int readSize=1024;
+
         float[] floatBuffer = new float[readSize];
         Double[] toTransformD = new Double[blockSize];
 
-        YINPitchDetector detector = new YINPitchDetector(sampleRate,readSize);
+
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
@@ -109,7 +121,7 @@ public class AudioUtil implements Runnable{
 
                    //int bufferReadResult = audioRecord.read(buffer,0,readSize);
                    int bufferReadResult = audioRecord.read(floatBuffer,0,readSize,AudioRecord.READ_NON_BLOCKING);
-                    frequency = detector.detect(floatBuffer);
+
                    //for(int i = 0; i < blockSize && i < bufferReadResult; i++){
                    for(int i = 0; i < readSize && i < bufferReadResult; i++){
                        //toTransform[i] = (double)buffer[i] / Short.MAX_VALUE;
@@ -118,8 +130,18 @@ public class AudioUtil implements Runnable{
                        deque.addLast((double)floatBuffer[i]);
                    }
                    toTransformD = deque.toArray(toTransformD);
-                   for(int i=0; i<blockSize; i++)
+                   for(int i=0; i<blockSize; i++) {
                        toTransform[i] = toTransformD[i];
+                   }
+                    /////
+                   //float[] floatBuffer2 = new float[blockSize];
+                   //for(int i=0; i<blockSize;i++)
+                       //floatBuffer2[i]= (float)toTransform[i];
+                   pitchDetectionResult = pitchDetector1.getPitch(floatBuffer);
+                   if(pitchDetectionResult.getPitch()!=-1.0)
+                   frequency = pitchDetectionResult.getPitch();
+                   //////
+
 
                    transfromer.ft(toTransform);
 
@@ -196,7 +218,8 @@ public class AudioUtil implements Runnable{
             }
         }
 
-        canvas.drawText("Hz :: "+ index + " YIN::"+ frequency,100,100,paint2);
+        canvas.drawText("Hz :: "+ index + "Mag ::"+ toTransform[0][index] ,100,100,paint2);
+        canvas.drawText("Pitch::"+ frequency,100,200,paint2);
         canvasOutput.drawBitmap(bitmap ,0,0,null);
         imageView.invalidate();
     }
