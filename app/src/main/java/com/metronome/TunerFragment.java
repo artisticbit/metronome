@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,8 @@ public class TunerFragment extends Fragment {
     private  AudioUtil audioUtil;
     private PermissionUtil permissionUtil;
 
+    private Handler handler;
+
     private BtnOnClickListener btnOnClickListener;
     private  ImageView imageView;
 
@@ -50,7 +53,7 @@ public class TunerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        Log.d("test", "TunerFragment onCreateView!!");
         //튜너 진입시 퍼시션 체크
         permissionUtil = new PermissionUtil(getActivity());
         permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);

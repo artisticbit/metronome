@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.metronome.util.tarsos.DynamicWavelet;
+import com.metronome.util.tarsos.McLeodPitchMethod;
 import com.metronome.util.tarsos.PitchDetectionResult;
 import com.metronome.util.tarsos.PitchDetector;
 import com.metronome.util.tarsos.Yin;
@@ -34,7 +35,7 @@ public class AudioUtil implements Runnable{
 
     //YIN 용 초기화
       private int audioSource = MediaRecorder.AudioSource.MIC;
-      private int sampleRate = 16384;
+      private int sampleRate = 44100;//16384;
       private int channelCount = AudioFormat.CHANNEL_IN_MONO;
       private int audioFormat = AudioFormat.ENCODING_PCM_FLOAT;//AudioFormat.ENCODING_PCM_16BIT;////
       private int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelCount, audioFormat );
@@ -105,7 +106,7 @@ public class AudioUtil implements Runnable{
         PitchDetector pitchDetector = new Yin(sampleRate, readSize);
         PitchDetectionResult pitchDetectionResult;
         PitchDetector pitchDetector1 = new DynamicWavelet(sampleRate,readSize);
-
+        PitchDetector pitchDetector2 = new McLeodPitchMethod(sampleRate,readSize);
         for(int i=0; i<blockSize; i++){
             deque.add(0.0);
         }
@@ -137,7 +138,7 @@ public class AudioUtil implements Runnable{
                    //float[] floatBuffer2 = new float[blockSize];
                    //for(int i=0; i<blockSize;i++)
                        //floatBuffer2[i]= (float)toTransform[i];
-                   pitchDetectionResult = pitchDetector1.getPitch(floatBuffer);
+                   pitchDetectionResult = pitchDetector2.getPitch(floatBuffer);
                    if(pitchDetectionResult.getPitch()!=-1.0)
                    frequency = pitchDetectionResult.getPitch();
                    //////
