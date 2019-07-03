@@ -1,46 +1,38 @@
 package com.metronome.util;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.AudioTrack;
 import android.media.MediaRecorder;
-import android.provider.MediaStore;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.widget.ImageView;
 
-import com.metronome.util.tarsos.DynamicWavelet;
+import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.tarsos.McLeodPitchMethod;
 import com.metronome.util.tarsos.PitchDetectionResult;
 import com.metronome.util.tarsos.PitchDetector;
-import com.metronome.util.tarsos.Yin;
+import com.metronome.viewer.TunerViewer;
+
 
 import java.util.ArrayDeque;
+
 
 import ca.uol.aig.fftpack.RealDoubleFFT;
 
 public class AudioUtil implements Runnable{
 
     private AudioRecord audioRecord;
-    /*
-    private int audioSource = MediaRecorder.AudioSource.MIC;
-    private int sampleRate =    44100;//16384;//44100;
-    private int channelCount = AudioFormat.CHANNEL_IN_MONO;//AudioFormat.CHANNEL_CONFIGURATION_MONO;//AudioFormat.CHANNEL_IN_STEREO;
-    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    private int bufferSize = AudioRecord.getMinBufferSize(sampleRate,channelCount,audioFormat);
-    */
 
-    //YIN 용 초기화
-      private int audioSource = MediaRecorder.AudioSource.MIC;
-      private int sampleRate = 44100;//16384;
-      private int channelCount = AudioFormat.CHANNEL_IN_MONO;
-      private int audioFormat = AudioFormat.ENCODING_PCM_FLOAT;//AudioFormat.ENCODING_PCM_16BIT;////
-      private int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelCount, audioFormat );
-      private double frequency = 0f;
-    //
+    Handler handler;
+    TunerViewer tunerViewer;
+
+    private int audioSource = MediaRecorder.AudioSource.MIC;
+    private int sampleRate = 44100;//16384;
+    private int channelCount = AudioFormat.CHANNEL_IN_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_FLOAT;//AudioFormat.ENCODING_PCM_16BIT;////
+    private int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelCount, audioFormat );
+
 
     private AUDIO_MODE audioMode;
     private enum AUDIO_MODE{
@@ -48,16 +40,9 @@ public class AudioUtil implements Runnable{
     }
     private Thread thread;
 
-    public ImageView imageView;
-    public Bitmap bitmap;
-    public Bitmap bitmapOutput;
-    public Canvas canvas;
-    public Canvas canvasOutput;
-    public Paint paint;
-    public Paint paint2;
-
-    public AudioUtil(){
+    public AudioUtil(TunerViewer tunerViewer){
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
+        this.tunerViewer = tunerViewer;
     }
     public AudioUtil(int audioSource, int sampleRate, int channelCount, int audioFormat, int bufferSize){
         this.audioSource = audioSource;
@@ -67,6 +52,10 @@ public class AudioUtil implements Runnable{
         this.bufferSize = bufferSize;
 
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
+    }
+
+    public void setHandler(Handler handler){
+        this.handler = handler;
     }
 
     public void startRecord(){
@@ -103,10 +92,12 @@ public class AudioUtil implements Runnable{
         ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
 
         //tarsos 라이브러리 사용
-        PitchDetector pitchDetector = new Yin(sampleRate, readSize);
+        PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
         PitchDetectionResult pitchDetectionResult;
-        PitchDetector pitchDetector1 = new DynamicWavelet(sampleRate,readSize);
-        PitchDetector pitchDetector2 = new McLeodPitchMethod(sampleRate,readSize);
+
+        //메시지 전송 오브젝트
+        AudioAnalysisResult audioAnalysisResult = new AudioAnalysisResult();
+
         for(int i=0; i<blockSize; i++){
             deque.add(0.0);
         }
@@ -138,16 +129,24 @@ public class AudioUtil implements Runnable{
                    //float[] floatBuffer2 = new float[blockSize];
                    //for(int i=0; i<blockSize;i++)
                        //floatBuffer2[i]= (float)toTransform[i];
-                   pitchDetectionResult = pitchDetector2.getPitch(floatBuffer);
-                   if(pitchDetectionResult.getPitch()!=-1.0)
-                   frequency = pitchDetectionResult.getPitch();
+
                    //////
-
-
+                   pitchDetectionResult = pitchDetector.getPitch(floatBuffer);
                    transfromer.ft(toTransform);
 
+                   if(pitchDetectionResult.getPitch()!=-1) {
+                       audioAnalysisResult.pitch = pitchDetectionResult.getPitch();
+                   }
+                   audioAnalysisResult.fftResult = toTransform;
                    //Log.d("test", "run: "+toTransform[0]);
-                   onProgressUpdate(toTransform);
+                    tunerViewer.drawPitchView(audioAnalysisResult);
+                   //핸들러쪽으로 메시지전송
+                   /*
+                   Message msg = new Message();
+                   msg.obj=audioAnalysisResult;
+                   msg.what=0;
+                   handler.sendMessage(msg);
+                   */
                }
                 break;
             case AUDIO_MODE_RECORD:
@@ -159,69 +158,4 @@ public class AudioUtil implements Runnable{
         Log.d("test", "audioUtil Thread End!!!");
     }
 
-/*
-//YIN 알고리즘 테스트
-    @Override
-    public void run() {
-        int readSize = bufferSize/4;
-        short[] buffer = new short[readSize];
-        float[] floatBuffer = new float[readSize];
-        YINPitchDetector detector = new YINPitchDetector(sampleRate,readSize);
-        short SHORT_DIVISOR = (short) (-1 * Short.MIN_VALUE);
-        Log.d("test", "readSize :: "+ readSize);
-        switch (audioMode){
-            case AUDIO_MODE_ANALYZE:
-                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
-                    audioRecord.read(floatBuffer,0,readSize,AudioRecord.READ_BLOCKING);
-
-                    double frequency = detector.detect(floatBuffer);
-                    Log.d("test", "Frequency ::" + frequency);
-                }
-                break;
-            case AUDIO_MODE_RECORD:
-                break;
-            case AUDIO_MODE_PLAY:
-                break;
-        }
-
-        Log.d("test", "audioUtil Thread End!!!");
-    }
-
-    */
-    //그림용 테스트펑션
-    public void setImageView(ImageView imageView){
-        //테스트코드
-        this.imageView = imageView;
-        bitmap = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
-        bitmapOutput = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        canvasOutput = new Canvas(bitmapOutput);
-        paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint2 = new Paint();
-        paint2.setColor(Color.WHITE);
-        paint2.setTextSize(30);
-        imageView.setImageBitmap(bitmapOutput);
-        //
-    }
-    public void onProgressUpdate(double[]... toTransform) {
-        int index=0;
-        canvas.drawColor(Color.BLACK);
-        //Log.d("test", "toTransformLength:  "+toTransform[0].length);
-        for(int i = 0; i < toTransform[0].length; i++){
-            int x = i/4 ;
-            int downy = (int) (400 - (toTransform[0][i] * 10));
-            int upy = 400;
-            canvas.drawLine(x, downy, x, upy, paint);
-
-            if(toTransform[0][index]<toTransform[0][i]){
-                index = i;
-            }
-        }
-
-        canvas.drawText("Hz :: "+ index + "Mag ::"+ toTransform[0][index] ,100,100,paint2);
-        canvas.drawText("Pitch::"+ frequency,100,200,paint2);
-        canvasOutput.drawBitmap(bitmap ,0,0,null);
-        imageView.invalidate();
-    }
 }

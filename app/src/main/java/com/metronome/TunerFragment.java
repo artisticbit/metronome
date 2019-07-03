@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,8 @@ import android.widget.ImageView;
 
 import com.metronome.util.AudioUtil;
 import com.metronome.util.PermissionUtil;
+import com.metronome.util.domain.AudioAnalysisResult;
+import com.metronome.viewer.TunerViewer;
 
 
 /**
@@ -36,10 +39,13 @@ public class TunerFragment extends Fragment {
 
     private Handler handler;
 
+    private TunerViewer tunerViewer;
+
     private BtnOnClickListener btnOnClickListener;
-    private  ImageView imageView;
 
     private Button tunerStartBtn;
+
+
     public TunerFragment() {
         // Required empty public constructor
     }
@@ -54,6 +60,20 @@ public class TunerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d("test", "TunerFragment onCreateView!!");
+        //핸들러 초기화
+        handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                switch (msg.what){
+                    case 0:
+                        //tunerViewer.drawPitchView(msg);
+                        break;
+                    case 1:
+                        break;
+                }
+            }
+        };
+
         //튜너 진입시 퍼시션 체크
         permissionUtil = new PermissionUtil(getActivity());
         permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO);
@@ -64,8 +84,8 @@ public class TunerFragment extends Fragment {
         tunerStartBtn = view.findViewById(R.id.tunerStartBtn);
         tunerStartBtn.setOnClickListener(btnOnClickListener);
 
+        tunerViewer = new TunerViewer(view);
 
-        imageView = view.findViewById(R.id.imageView);
         return view;
 
     }
@@ -84,8 +104,8 @@ public class TunerFragment extends Fragment {
                    if( permissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO,PermissionUtil.PERMISSION_CODE_RECORD_AUDIO)){
                        Log.d("test","tunerStartBtnClick!");
                        if(audioUtil==null) {
-                           audioUtil = new AudioUtil();
-                           audioUtil.setImageView(imageView);//
+                           audioUtil = new AudioUtil(tunerViewer);
+                           audioUtil.setHandler(handler);
                        }
                        audioUtil.startAnalyze();
                    }
@@ -93,7 +113,6 @@ public class TunerFragment extends Fragment {
             }
         }
     }
-
 
 
 }
