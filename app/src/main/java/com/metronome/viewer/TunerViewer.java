@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.metronome.R;
 import com.metronome.util.domain.AudioAnalysisResult;
+import com.metronome.util.domain.ScaleConvertResult;
 
 public class TunerViewer implements Runnable {
 
@@ -26,6 +27,11 @@ public class TunerViewer implements Runnable {
     public Canvas canvasOutput;
     public Paint paint;
     public Paint paint2;
+    //
+    //
+    public ImageView imageView2;
+    public Bitmap tunerBitmap;
+    public int centerPoint;
     //
 
     //AudioAnalysisResult audioAnalysisResult;
@@ -45,6 +51,13 @@ public class TunerViewer implements Runnable {
         paint2.setColor(Color.WHITE);
         paint2.setTextSize(30);
         imageView.setImageBitmap(bitmapOutput);
+
+        //
+        int width=view.getWidth();
+        centerPoint = width/2;
+        imageView2 = view.findViewById(R.id.imageView2);
+        tunerBitmap =  Bitmap.createBitmap((int)width, (int)400, Bitmap.Config.ARGB_8888);
+        //
     }
 
 
@@ -66,7 +79,7 @@ public class TunerViewer implements Runnable {
 
     public void drawPitchView(AudioAnalysisResult audioAnalysisResult){
         double[] fftOutput = audioAnalysisResult.fftResult;
-        float pitch = audioAnalysisResult.pitch;
+        float pitch = audioAnalysisResult.frequency;
 
         int index=0;
         canvas.drawColor(Color.BLACK);
@@ -88,4 +101,9 @@ public class TunerViewer implements Runnable {
         canvasOutput.drawBitmap(bitmap ,0,0,null);
         imageView.invalidate();
     }
+
+    public void drawTunerResult(ScaleConvertResult scaleConvertResult){
+
+    }
+
 }
