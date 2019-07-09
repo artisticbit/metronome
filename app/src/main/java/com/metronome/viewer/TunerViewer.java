@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.metronome.R;
+import com.metronome.util.ContextManager;
 import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.domain.ScaleConvertResult;
 
@@ -56,13 +57,14 @@ public class TunerViewer implements Runnable {
         imageView.setImageBitmap(bitmapOutput);
 
         //
-        screenWidth = view.getWidth();
+        screenWidth = ContextManager.getScreenSize().x;
         centerPoint = screenWidth/2;
         imageView2 = view.findViewById(R.id.imageView2);
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
         tunerPaint = new Paint();
         tunerPaint.setColor(Color.YELLOW);
+        tunerPaint.setTextSize(30);
         imageView2.setImageBitmap(tunerBitmap);
         //
     }
@@ -110,8 +112,10 @@ public class TunerViewer implements Runnable {
     }
 
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
-
-        canvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 5 , tunerPaint );
+        tunerCanvas.drawColor(Color.WHITE);
+        tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 5 , tunerPaint );
+        //tunerCanvas.drawText(scaleConvertResult.scaleWord);
+        imageView2.invalidate();
     }
 
 }
