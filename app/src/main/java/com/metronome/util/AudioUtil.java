@@ -143,7 +143,7 @@ public class AudioUtil implements Runnable{
                     tunerViewer.drawPitchView(audioAnalysisResult);
 
                     ScaleConverter scaleConverter = new ScaleConverter();
-                   ScaleConvertResult scaleConvertResult = scaleConverter.getScale(audioAnalysisResult.frequency);
+                    ScaleConvertResult scaleConvertResult = scaleConverter.getScale(audioAnalysisResult.frequency);
                     tunerViewer.drawTunerResult(scaleConvertResult);
                    //핸들러쪽으로 메시지전송
                    /*
