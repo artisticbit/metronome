@@ -1,35 +1,39 @@
 package com.metronome.util;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.widget.ImageView;
 
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
+import com.metronome.util.domain.AudioAnalysisResult;
+import com.metronome.util.domain.ScaleConvertResult;
+import com.metronome.util.tarsos.McLeodPitchMethod;
+import com.metronome.util.tarsos.PitchDetectionResult;
+import com.metronome.util.tarsos.PitchDetector;
+import com.metronome.viewer.TunerViewer;
 
-import com.metronome.R;
+
+import java.util.ArrayDeque;
+
 
 import ca.uol.aig.fftpack.RealDoubleFFT;
 
 public class AudioUtil implements Runnable{
 
     private AudioRecord audioRecord;
+
+    Handler handler;
+    TunerViewer tunerViewer;
+
     private int audioSource = MediaRecorder.AudioSource.MIC;
-    private int sampleRate =    44100;//44100;
-    private int channelCount = AudioFormat.CHANNEL_IN_STEREO;
-    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-    private int bufferSize = AudioTrack.getMinBufferSize(sampleRate,channelCount,audioFormat);
+    private int sampleRate = 44100;//16384;
+    private int channelCount = AudioFormat.CHANNEL_IN_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_FLOAT;//AudioFormat.ENCODING_PCM_16BIT;////
+    private int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelCount, audioFormat );
+
 
     private AUDIO_MODE audioMode;
     private enum AUDIO_MODE{
@@ -37,15 +41,9 @@ public class AudioUtil implements Runnable{
     }
     private Thread thread;
 
-    public ImageView imageView;
-    public Bitmap bitmap;
-    public Bitmap bitmapOutput;
-    public Canvas canvas;
-    public Canvas canvasOutput;
-    public Paint paint;
-
-    public AudioUtil(){
+    public AudioUtil(TunerViewer tunerViewer){
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
+        this.tunerViewer = tunerViewer;
     }
     public AudioUtil(int audioSource, int sampleRate, int channelCount, int audioFormat, int bufferSize){
         this.audioSource = audioSource;
@@ -55,6 +53,10 @@ public class AudioUtil implements Runnable{
         this.bufferSize = bufferSize;
 
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
+    }
+
+    public void setHandler(Handler handler){
+        this.handler = handler;
     }
 
     public void startRecord(){
@@ -77,25 +79,79 @@ public class AudioUtil implements Runnable{
         }
 
     }
+/*
+ */
 
     @Override
     public void run() {
         byte[] readData = new byte[bufferSize];
-        int blockSize = 512;
+        int blockSize = 8192;
+        int readSize=1024;
         RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
         short[] buffer = new short[blockSize];
         double[] toTransform = new double[blockSize];
+        ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
+
+        //tarsos 라이브러리 사용
+        PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
+        PitchDetectionResult pitchDetectionResult;
+
+        //메시지 전송 오브젝트
+        AudioAnalysisResult audioAnalysisResult = new AudioAnalysisResult();
+
+        for(int i=0; i<blockSize; i++){
+            deque.add(0.0);
+        }
+
+        float[] floatBuffer = new float[readSize];
+        Double[] toTransformD = new Double[blockSize];
+
 
         switch (audioMode){
             case AUDIO_MODE_ANALYZE:
                while(audioRecord.getRecordingState()==AudioRecord.RECORDSTATE_RECORDING){
-                   int bufferReadResult = audioRecord.read(buffer,0,blockSize);
-                   for(int i = 0; i < blockSize && i < bufferReadResult; i++){
-                       toTransform[i] = (double)buffer[i] / Short.MAX_VALUE;
+                   //int bufferReadResult = audioRecord.read(buffer,0,blockSize); //blockSize에서 작은사이즈로
+
+                   //int bufferReadResult = audioRecord.read(buffer,0,readSize);
+                   int bufferReadResult = audioRecord.read(floatBuffer,0,readSize,AudioRecord.READ_NON_BLOCKING);
+
+                   //for(int i = 0; i < blockSize && i < bufferReadResult; i++){
+                   for(int i = 0; i < readSize && i < bufferReadResult; i++){
+                       //toTransform[i] = (double)buffer[i] / Short.MAX_VALUE;
+                       deque.removeFirst();//
+                       //deque.addLast((double)buffer[i] / Short.MAX_VALUE);//
+                       deque.addLast((double)floatBuffer[i]);
                    }
+                   toTransformD = deque.toArray(toTransformD);
+                   for(int i=0; i<blockSize; i++) {
+                       toTransform[i] = toTransformD[i];
+                   }
+                    /////
+                   //float[] floatBuffer2 = new float[blockSize];
+                   //for(int i=0; i<blockSize;i++)
+                       //floatBuffer2[i]= (float)toTransform[i];
+
+                   //////
+                   pitchDetectionResult = pitchDetector.getPitch(floatBuffer);
                    transfromer.ft(toTransform);
+
+                   if(pitchDetectionResult.getPitch()!=-1) {
+                       audioAnalysisResult.frequency = pitchDetectionResult.getPitch();
+                   }
+                   audioAnalysisResult.fftResult = toTransform;
                    //Log.d("test", "run: "+toTransform[0]);
-                   onProgressUpdate(toTransform);
+                    tunerViewer.drawPitchView(audioAnalysisResult);
+
+                    ScaleConverter scaleConverter = new ScaleConverter();
+                   ScaleConvertResult scaleConvertResult = scaleConverter.getScale(audioAnalysisResult.frequency);
+                    tunerViewer.drawTunerResult(scaleConvertResult);
+                   //핸들러쪽으로 메시지전송
+                   /*
+                   Message msg = new Message();
+                   msg.obj=audioAnalysisResult;
+                   msg.what=0;
+                   handler.sendMessage(msg);
+                   */
                }
                 break;
             case AUDIO_MODE_RECORD:
@@ -107,32 +163,4 @@ public class AudioUtil implements Runnable{
         Log.d("test", "audioUtil Thread End!!!");
     }
 
-
-    //그림용 테스트펑션
-    public void setImageView(ImageView imageView){
-        //테스트코드
-        this.imageView = imageView;
-        bitmap = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
-        bitmapOutput = Bitmap.createBitmap((int)512, (int)200, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        canvasOutput = new Canvas(bitmapOutput);
-        paint = new Paint();
-        paint.setColor(Color.GREEN);
-        imageView.setImageBitmap(bitmapOutput);
-        //
-    }
-    public void onProgressUpdate(double[]... toTransform) {
-
-        canvas.drawColor(Color.BLACK);
-        //Log.d("test", "toTransformLength:  "+toTransform[0].length);
-        for(int i = 0; i < toTransform[0].length; i++){
-            int x = i;
-            int downy = (int) (200 - (toTransform[0][i] * 10));
-            int upy = 200;
-            canvas.drawLine(x, downy, x, upy, paint);
-
-        }
-        canvasOutput.drawBitmap(bitmap ,0,0,null);
-        imageView.invalidate();
-    }
 }
