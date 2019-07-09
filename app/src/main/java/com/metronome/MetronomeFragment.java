@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import java.util.TimerTask;
 
 public class MetronomeFragment extends Fragment {
     private PopupWindow tempoPopup;
+    NumberPicker picker_molecule, picker_denominator;
     TextView textview, bpmView;
     TimerTask task;
     Timer timer;
@@ -41,9 +43,8 @@ public class MetronomeFragment extends Fragment {
                 final View tempView = getLayoutInflater().inflate(R.layout.tempo_popup, null);
                 tempoPopup = new PopupWindow(tempView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 tempoPopup.showAtLocation(tempView, Gravity.CENTER, 0, 0);
-
-                //외부 영역 선택시 popup 종료
-                tempoPopup.setFocusable(true);
+                picker_molecule = tempView.findViewById(R.id.picker_molecule);
+                picker_denominator = tempView.findViewById(R.id.picker_denominator);
 
                 //tempPopup 이벤트
                 Button temp = tempView.findViewById(R.id.CANCLE);
@@ -62,6 +63,13 @@ public class MetronomeFragment extends Fragment {
                         //Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                //NumberPicker molecule / denominator 설정
+                picker_molecule.setMinValue(1);
+                picker_molecule.setMaxValue(12);
+                picker_denominator.setMinValue(0);
+                picker_denominator.setMaxValue(2);
+                picker_denominator.setDisplayedValues(new String[] {"2", "4", "8"});
             }
         });
 
@@ -94,13 +102,13 @@ public class MetronomeFragment extends Fragment {
                 task.cancel();
                 task.scheduledExecutionTime();
                 timer.purge();
-            }
-        });
-        return view;
     }
+});
+        return view;
+        }
 
-    //타이머 메소드
-    public TimerTask timerTask() {
+//타이머 메소드
+public TimerTask timerTask() {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
