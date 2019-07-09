@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.metronome.util.domain.AudioAnalysisResult;
+import com.metronome.util.domain.ScaleConvertResult;
 import com.metronome.util.tarsos.McLeodPitchMethod;
 import com.metronome.util.tarsos.PitchDetectionResult;
 import com.metronome.util.tarsos.PitchDetector;
@@ -135,11 +136,15 @@ public class AudioUtil implements Runnable{
                    transfromer.ft(toTransform);
 
                    if(pitchDetectionResult.getPitch()!=-1) {
-                       audioAnalysisResult.pitch = pitchDetectionResult.getPitch();
+                       audioAnalysisResult.frequency = pitchDetectionResult.getPitch();
                    }
                    audioAnalysisResult.fftResult = toTransform;
                    //Log.d("test", "run: "+toTransform[0]);
                     tunerViewer.drawPitchView(audioAnalysisResult);
+
+                    ScaleConverter scaleConverter = new ScaleConverter();
+                   ScaleConvertResult scaleConvertResult = scaleConverter.getScale(audioAnalysisResult.frequency);
+                    tunerViewer.drawTunerResult(scaleConvertResult);
                    //핸들러쪽으로 메시지전송
                    /*
                    Message msg = new Message();

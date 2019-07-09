@@ -31,7 +31,10 @@ public class TunerViewer implements Runnable {
     //
     public ImageView imageView2;
     public Bitmap tunerBitmap;
+    public Canvas tunerCanvas;
+    public Paint tunerPaint;
     public int centerPoint;
+    public int screenWidth;
     //
 
     //AudioAnalysisResult audioAnalysisResult;
@@ -53,10 +56,14 @@ public class TunerViewer implements Runnable {
         imageView.setImageBitmap(bitmapOutput);
 
         //
-        int width=view.getWidth();
-        centerPoint = width/2;
+        screenWidth = view.getWidth();
+        centerPoint = screenWidth/2;
         imageView2 = view.findViewById(R.id.imageView2);
-        tunerBitmap =  Bitmap.createBitmap((int)width, (int)400, Bitmap.Config.ARGB_8888);
+        tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
+        tunerCanvas = new Canvas(tunerBitmap);
+        tunerPaint = new Paint();
+        tunerPaint.setColor(Color.YELLOW);
+        imageView2.setImageBitmap(tunerBitmap);
         //
     }
 
@@ -104,6 +111,7 @@ public class TunerViewer implements Runnable {
 
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
 
+        canvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 5 , tunerPaint );
     }
 
 }
