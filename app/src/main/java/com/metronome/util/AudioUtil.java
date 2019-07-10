@@ -91,7 +91,8 @@ public class AudioUtil implements Runnable{
         short[] buffer = new short[blockSize];
         double[] toTransform = new double[blockSize];
         ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
-
+        float frequency =0;
+        ScaleConverter scaleConverter = new ScaleConverter();
         //tarsos 라이브러리 사용
         PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
         PitchDetectionResult pitchDetectionResult;
@@ -131,21 +132,26 @@ public class AudioUtil implements Runnable{
                    //for(int i=0; i<blockSize;i++)
                        //floatBuffer2[i]= (float)toTransform[i];
 
-                   //////
+                   //////현재 주파수 분석 결과물
                    pitchDetectionResult = pitchDetector.getPitch(floatBuffer);
+                   //FFT 변화
                    transfromer.ft(toTransform);
 
-                   if(pitchDetectionResult.getPitch()!=-1) {
-                       audioAnalysisResult.frequency = pitchDetectionResult.getPitch();
-                   }
-                   audioAnalysisResult.fftResult = toTransform;
-                   //Log.d("test", "run: "+toTransform[0]);
-                    tunerViewer.drawPitchView(audioAnalysisResult);
+                   frequency = pitchDetectionResult.getPitch();
+                   if(frequency != -1) {
+                       audioAnalysisResult.frequency = frequency;
+                       audioAnalysisResult.fftResult = toTransform;
+                       tunerViewer.drawPitchView(audioAnalysisResult);
 
-                    ScaleConverter scaleConverter = new ScaleConverter();
-                    ScaleConvertResult scaleConvertResult = scaleConverter.getScale(pitchDetectionResult.getPitch());
-                    tunerViewer.drawTunerResult(scaleConvertResult);
-                   //핸들러쪽으로 메시지전송
+                       //획득 주파수를 이용하여 음역대 분석 후 화면 줄력
+                       ScaleConvertResult scaleConvertResult = scaleConverter.getScale(frequency);
+                       tunerViewer.drawTunerResult(scaleConvertResult);
+                   }
+
+                   //Log.d("test", "run: "+toTransform[0]);
+
+
+                    //핸들러쪽으로 메시지전송
                    /*
                    Message msg = new Message();
                    msg.obj=audioAnalysisResult;

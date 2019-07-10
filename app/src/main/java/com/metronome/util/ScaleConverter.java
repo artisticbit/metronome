@@ -29,12 +29,13 @@ public class ScaleConverter {
         ScaleConvertResult scaleConvertResult = new ScaleConvertResult();
         int octave = 0;
         float errorFrequency = 0;
-        String scaleWord=""
-                ;
+        String scaleWord="";
+
+        int j=0;
         for(int i=1; i<scaleMatrix.length; i++){
             if(frequency < scaleMatrix[i][0]){
                 octave = i-1;
-                for(int j=1; j<scaleMatrix[octave].length; j++){
+                for( j=1; j<scaleMatrix[octave].length; j++){
                     if(frequency<scaleMatrix[octave][j]){
                         float upperError = frequency - scaleMatrix[octave][j-1] ;
                         float lowerError = frequency - scaleMatrix[octave][j];
