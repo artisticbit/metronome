@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.metronome.R;
 import com.metronome.util.ContextManager;
+import com.metronome.util.ScaleConverter;
 import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.domain.ScaleConvertResult;
 
@@ -116,7 +117,9 @@ public class TunerViewer implements Runnable {
     }
 
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
-        String scaleWord = scaleConvertResult.scaleWord;
+        int scale = scaleConvertResult.scale;
+        String scaleWord = ScaleConverter.scaleWordList[scale];
+
         float frequency = scaleConvertResult.frequency;
         Log.d("scaleWord", "scaleWord: "+scaleWord);
         tunerCanvas.drawColor(Color.YELLOW);
