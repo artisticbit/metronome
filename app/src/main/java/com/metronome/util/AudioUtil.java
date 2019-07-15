@@ -93,7 +93,7 @@ public class AudioUtil implements Runnable{
     float frequency =0;
     //음역추출용 클래스 초기화
     ScaleConverter scaleConverter = new ScaleConverter();
-    ScaleConvertResult scaleConvertResult=scaleConverter.getScale(440);;
+    ScaleConvertResult scaleConvertResult=scaleConverter.getScale(64);;
     //tarsos 라이브러리 사용
     PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
     PitchDetectionResult pitchDetectionResult;

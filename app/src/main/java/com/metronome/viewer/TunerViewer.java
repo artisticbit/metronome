@@ -119,7 +119,7 @@ public class TunerViewer implements Runnable {
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
         int scale = scaleConvertResult.scale;
         String scaleWord = ScaleConverter.scaleWordList[scale];
-
+        String errorFrequency = scaleConvertResult.erroFrequency+"";
         float frequency = scaleConvertResult.frequency;
         Log.d("scaleWord", "scaleWord: "+scaleWord);
         tunerCanvas.drawColor(Color.YELLOW);

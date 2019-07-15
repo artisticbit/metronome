@@ -39,27 +39,39 @@ public class ScaleConverter {
                 break;
             }
         }
+        boolean findInterOctav = false;
         //옥타브 사이 음정 판별
-        if(frequency<=scaleMatrix[octave][0]){
-
-        }
-        //음정 계산
-        for(int j=1; j<scaleMatrix[octave].length; j++){
-            if(frequency<=scaleMatrix[octave][j]){
-                float upperError = frequency - scaleMatrix[octave][j-1] ;
-                float lowerError = frequency - scaleMatrix[octave][j];
-                if(Math.abs(upperError) < Math.abs(lowerError)){
-                    errorFrequency = upperError;
-                    scale = j-1;
-                }else{
-                    errorFrequency = lowerError;
-                    scale = j;
-                }
-                //scaleWord = scaleWordList[scale];
-                break;
+        if(frequency>=scaleMatrix[octave][11]){
+            findInterOctav = true;
+            float upperError = frequency - scaleMatrix[octave][11] ;
+            float lowerError = frequency - scaleMatrix[octave+1][0];
+            if(Math.abs(upperError) < Math.abs(lowerError)){
+                errorFrequency = upperError;
+                scale = 11;
+            }else{
+                errorFrequency = lowerError;
+                octave = octave +1;
+                scale = 0;
             }
         }
-
+        //음정 계산 위에서 판별시 스킵
+        if(!findInterOctav) {
+            for (int j = 1; j < 12; j++) {
+                if (frequency <= scaleMatrix[octave][j]) {
+                    float upperError = frequency - scaleMatrix[octave][j - 1];
+                    float lowerError = frequency - scaleMatrix[octave][j];
+                    if (Math.abs(upperError) < Math.abs(lowerError)) {
+                        errorFrequency = upperError;
+                        scale = j - 1;
+                    } else {
+                        errorFrequency = lowerError;
+                        scale = j;
+                    }
+                    //scaleWord = scaleWordList[scale];
+                    break;
+                }
+            }
+        }
         scaleConvertResult.frequency= frequency;
         scaleConvertResult.octave = octave;
         scaleConvertResult.scale = scale;
