@@ -1,7 +1,6 @@
 package com.metronome;
 
 import androidx.fragment.app.Fragment;
-
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,7 +19,7 @@ import java.util.TimerTask;
 public class MetronomeFragment extends Fragment {
     private PopupWindow tempoPopup;
     NumberPicker picker_molecule, picker_denominator;
-    TextView textview, bpmView;
+    TextView timeView, bpmText, tempoView, bpmView;
     TimerTask task;
     Timer timer;
     Button start, stop;
@@ -30,8 +29,10 @@ public class MetronomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_metronome, null);
         SeekBar seekBar  = view.findViewById(R.id.BPMSeekBar);
-        textview = view.findViewById(R.id.clickOutput);
-        bpmView = view.findViewById(R.id.BPMText);
+        timeView = view.findViewById(R.id.clickOutput);
+        tempoView = view.findViewById(R.id.tempoView);
+        bpmView = view.findViewById(R.id.bpmView);
+        bpmText = view.findViewById(R.id.BPMText);
         start = view.findViewById(R.id.start);
         stop = view.findViewById(R.id.stop);
 
@@ -60,16 +61,22 @@ public class MetronomeFragment extends Fragment {
                     // 확인 이벤트
                     @Override
                     public void onClick(View v) {
+                        picker_molecule.setValue(picker_molecule.getValue());
+                        tempoView.setText(picker_molecule.getDisplayedValues()[picker_molecule.getValue()] + " / " + picker_denominator.getDisplayedValues()[picker_denominator.getValue()]);
+                        tempoPopup.dismiss();
                         //Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 //NumberPicker molecule / denominator 설정
-                picker_molecule.setMinValue(1);
-                picker_molecule.setMaxValue(12);
+                picker_molecule.setMinValue(0);
+                picker_molecule.setMaxValue(11);
+                picker_molecule.setValue(0);
+                picker_molecule.setDisplayedValues(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"});
                 picker_denominator.setMinValue(0);
-                picker_denominator.setMaxValue(2);
-                picker_denominator.setDisplayedValues(new String[] {"2", "4", "8"});
+                picker_denominator.setMaxValue(5);
+                picker_denominator.setValue(0);
+                picker_denominator.setDisplayedValues(new String[] {"2", "4", "8", "2", "4", "8"});
             }
         });
 
@@ -81,7 +88,7 @@ public class MetronomeFragment extends Fragment {
             public void onStartTrackingTouch(SeekBar seekBar) {}
             //드래그를 멈추면 발생하는 이벤트
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                bpmView.setText(String.valueOf(progress));
+                bpmText.setText(String.valueOf(progress));
             }
         });
 
@@ -112,7 +119,7 @@ public TimerTask timerTask() {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                textview.setText(String.valueOf(i++));
+                timeView.setText(String.valueOf(i++));
             }
         };
         return task;
