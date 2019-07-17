@@ -1,9 +1,12 @@
 package com.metronome.viewer;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +42,9 @@ public class TunerViewer implements Runnable {
     public Paint tunerPaint;
     public int centerPoint;
     public int screenWidth;
+    public BitmapDrawable backgroundDrawble;
+    public Bitmap backgroundBitmap;
+    public Resources resources;
     //
 
     //AudioAnalysisResult audioAnalysisResult;
@@ -71,7 +77,9 @@ public class TunerViewer implements Runnable {
         tunerPaint.setColor(Color.BLACK);
         tunerPaint.setTextSize(30);
         imageView2.setImageBitmap(tunerBitmapOutput);
-        //
+        resources =  ContextManager.getContext().getResources();
+        backgroundDrawble = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency,null);
+        backgroundBitmap = backgroundDrawble.getBitmap();
     }
 
 
@@ -122,7 +130,8 @@ public class TunerViewer implements Runnable {
         String errorFrequency = scaleConvertResult.erroFrequency+"";
         float frequency = scaleConvertResult.frequency;
         Log.d("scaleWord", "scaleWord: "+scaleWord);
-        tunerCanvas.drawColor(Color.YELLOW);
+        tunerCanvas.drawColor(Color.WHITE);
+        tunerCanvas.drawBitmap(backgroundBitmap,0,0,null);
         tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 10 , tunerPaint );
         tunerCanvas.drawText(scaleWord,centerPoint,150,tunerPaint);
 
