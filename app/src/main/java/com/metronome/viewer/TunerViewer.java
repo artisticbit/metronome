@@ -44,6 +44,7 @@ public class TunerViewer implements Runnable {
     public int screenWidth;
     public BitmapDrawable backgroundDrawble;
     public Bitmap backgroundBitmap;
+    public Bitmap backgroundBitmapResize;
     public Resources resources;
     //
 
@@ -77,9 +78,21 @@ public class TunerViewer implements Runnable {
         tunerPaint.setColor(Color.BLACK);
         tunerPaint.setTextSize(30);
         imageView2.setImageBitmap(tunerBitmapOutput);
+
+        //배경 비트맵 초기화 , 사이즈조절
+        int viewWidth = imageView2.getMeasuredWidth();
+        int viewHeight = imageView2.getMeasuredHeight();
         resources =  ContextManager.getContext().getResources();
         backgroundDrawble = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency,null);
         backgroundBitmap = backgroundDrawble.getBitmap();
+        Log.d("test", "bgBitmap"+backgroundBitmap.getWidth()+":"+backgroundBitmap.getHeight());
+        double aspectRatio = (double)backgroundBitmap.getHeight() / (double)backgroundBitmap.getWidth();
+        int resizeWidth = screenWidth;
+        int resizeHeight = (int) (resizeWidth*aspectRatio);
+        backgroundBitmapResize = Bitmap.createScaledBitmap(backgroundBitmap ,resizeWidth, resizeHeight,false);
+        //backgroundBitmapResize = Bitmap.createScaledBitmap(backgroundBitmap ,300, 200,false);
+
+        Log.d("test", aspectRatio+":"+resizeWidth+":"+resizeHeight);
     }
 
 
@@ -131,10 +144,11 @@ public class TunerViewer implements Runnable {
         float frequency = scaleConvertResult.frequency;
         Log.d("scaleWord", "scaleWord: "+scaleWord);
         tunerCanvas.drawColor(Color.WHITE);
-        tunerCanvas.drawBitmap(backgroundBitmap,0,0,null);
+        tunerCanvas.drawBitmap(backgroundBitmapResize,0,0,null);
         tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 10 , tunerPaint );
         tunerCanvas.drawText(scaleWord,centerPoint,150,tunerPaint);
-
+        tunerCanvas.drawCircle(0,0,10,tunerPaint);
+        tunerCanvas.drawCircle(screenWidth,0,10,tunerPaint);
         tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
 
         imageView2.invalidate();
