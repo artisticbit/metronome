@@ -27,8 +27,9 @@ public class MetronomeFragment extends Fragment {
     Button start, stop;
     double timeValue = 0.1666666666666667;
     int bpm = 10;
-    int tempo = 2;
-    int i = 0;
+    int molecule = 1;
+    int denominator = 2;
+    int i = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,9 +79,10 @@ public class MetronomeFragment extends Fragment {
                     // 확인 이벤트
                     @Override
                     public void onClick(View v) {
-                        tempo = Integer.parseInt(picker_denominator.getDisplayedValues()[picker_denominator.getValue()]);
-                        timeValue = tempoBPM.tempView(bpm, tempo);
-                        tempoView.setText(picker_molecule.getDisplayedValues()[picker_molecule.getValue()] + " / " + tempo);
+                        denominator = Integer.parseInt(picker_denominator.getDisplayedValues()[picker_denominator.getValue()]);
+                        molecule = Integer.parseInt(picker_molecule.getDisplayedValues()[picker_molecule.getValue()]);
+                        timeValue = tempoBPM.tempView(bpm, denominator);
+                        tempoView.setText(molecule + " / " + denominator);
                         valueText.setText(String.valueOf(timeValue));
                         tempoPopup.dismiss();
                     }
@@ -101,7 +103,7 @@ public class MetronomeFragment extends Fragment {
             //드래그를 멈추면 발생하는 이벤트
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 bpm = progress+10;
-                timeValue = tempoBPM.tempView(bpm, tempo);
+                timeValue = tempoBPM.tempView(bpm, denominator);
                 valueText.setText(String.valueOf(timeValue));
                 bpmView.setText(tempoBPM.bpmView(bpm));
                 bpmText.setText(String.valueOf(bpm));
@@ -135,7 +137,13 @@ public TimerTask timerTask() {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                timeView.setText(String.valueOf(i++));
+                if(i == 1 || (double)(i%molecule) == 0) {
+                    i++;
+                    timeView.setText("삡");
+                }
+                else {
+                    timeView.setText(String.valueOf(i++));
+                }
             }
         };
         return task;

@@ -4,9 +4,7 @@ import android.util.Log;
 
 public class TempoBPM {
     public double tempView(double bpm, double tempo) {
-        double result = (bpm/60) * (tempo/4);
-        Log.d("tempView : ", String.valueOf(result) + " : " + bpm + " : " + tempo);
-        return result;
+        return (bpm/60) * (tempo/4);
     }
 
     public String bpmView(int bpm) {
