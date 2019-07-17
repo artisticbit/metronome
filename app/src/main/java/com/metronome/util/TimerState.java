@@ -1,11 +1,18 @@
 package com.metronome.util;
 
+import android.content.Context;
+import android.os.Vibrator;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.metronome.util.ContextManager.getContext;
+
 public class TimerState {
+    final Vibrator vibrator = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
     TimerTask task;
     Timer timer;
     int second = 1;
@@ -22,6 +29,7 @@ public class TimerState {
         task.cancel();
         task.scheduledExecutionTime();
         timer.purge();
+        vibrator.cancel();
     }
 
     public TimerTask timerTask() {
@@ -30,9 +38,11 @@ public class TimerState {
             public void run() {
                 if (second == 1 || (double) (second % molecule) == 0) {
                     Log.e("timer log " + second, "+" );
+                    vibrator.vibrate(500);
                     second++;
                 } else {
                     Log.e("timer log " + second, "-");
+                    vibrator.vibrate(500);
                     second++;
                 }
             }
