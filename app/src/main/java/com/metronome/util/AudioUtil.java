@@ -41,6 +41,7 @@ public class AudioUtil implements Runnable{
     }
     private Thread thread;
 
+
     public AudioUtil(TunerViewer tunerViewer){
         audioRecord = new AudioRecord(audioSource,sampleRate,channelCount,audioFormat,bufferSize);
         this.tunerViewer = tunerViewer;
@@ -81,23 +82,28 @@ public class AudioUtil implements Runnable{
     }
 /*
  */
+    //튜너용 변수 초기화
+    byte[] readData = new byte[bufferSize];
+    int blockSize = 8192;
+    int readSize=1024;
+    RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
+    short[] buffer = new short[blockSize];
+    double[] toTransform = new double[blockSize];
+    ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
+    float frequency =0;
+    //음역추출용 클래스 초기화
+    ScaleConverter scaleConverter = new ScaleConverter();
+    ScaleConvertResult scaleConvertResult=scaleConverter.getScale(64);;
+    //tarsos 라이브러리 사용
+    PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
+    PitchDetectionResult pitchDetectionResult;
 
+    //메시지 전송 오브젝트
+    AudioAnalysisResult audioAnalysisResult = new AudioAnalysisResult();
+
+    //
     @Override
     public void run() {
-        byte[] readData = new byte[bufferSize];
-        int blockSize = 8192;
-        int readSize=1024;
-        RealDoubleFFT transfromer = new RealDoubleFFT(blockSize);
-        short[] buffer = new short[blockSize];
-        double[] toTransform = new double[blockSize];
-        ArrayDeque<Double> deque = new ArrayDeque<Double>(blockSize);
-
-        //tarsos 라이브러리 사용
-        PitchDetector pitchDetector = new McLeodPitchMethod(sampleRate,readSize);
-        PitchDetectionResult pitchDetectionResult;
-
-        //메시지 전송 오브젝트
-        AudioAnalysisResult audioAnalysisResult = new AudioAnalysisResult();
 
         for(int i=0; i<blockSize; i++){
             deque.add(0.0);
@@ -131,21 +137,29 @@ public class AudioUtil implements Runnable{
                    //for(int i=0; i<blockSize;i++)
                        //floatBuffer2[i]= (float)toTransform[i];
 
-                   //////
+                   //////현재 주파수 분석 결과물
                    pitchDetectionResult = pitchDetector.getPitch(floatBuffer);
+                   //FFT 변화
                    transfromer.ft(toTransform);
 
-                   if(pitchDetectionResult.getPitch()!=-1) {
-                       audioAnalysisResult.frequency = pitchDetectionResult.getPitch();
-                   }
-                   audioAnalysisResult.fftResult = toTransform;
-                   //Log.d("test", "run: "+toTransform[0]);
-                    tunerViewer.drawPitchView(audioAnalysisResult);
+                   frequency = pitchDetectionResult.getPitch();
 
-                    ScaleConverter scaleConverter = new ScaleConverter();
-                   ScaleConvertResult scaleConvertResult = scaleConverter.getScale(audioAnalysisResult.frequency);
-                    tunerViewer.drawTunerResult(scaleConvertResult);
-                   //핸들러쪽으로 메시지전송
+                   if(frequency > -1) {
+                       audioAnalysisResult.frequency = frequency;
+
+                       //획득 주파수를 이용하여 음역대 분석 후 화면 줄력
+                       scaleConvertResult = scaleConverter.getScale(frequency);
+
+                   }
+
+                   audioAnalysisResult.fftResult = toTransform;
+                   tunerViewer.drawPitchView(audioAnalysisResult);
+
+                   tunerViewer.drawTunerResult(scaleConvertResult);
+                   //Log.d("test", "run: "+toTransform[0]);
+
+
+                    //핸들러쪽으로 메시지전송
                    /*
                    Message msg = new Message();
                    msg.obj=audioAnalysisResult;

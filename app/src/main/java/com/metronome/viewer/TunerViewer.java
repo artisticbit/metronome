@@ -1,15 +1,20 @@
 package com.metronome.viewer;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.metronome.R;
+import com.metronome.util.ContextManager;
+import com.metronome.util.ScaleConverter;
 import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.domain.ScaleConvertResult;
 
@@ -31,10 +36,15 @@ public class TunerViewer implements Runnable {
     //
     public ImageView imageView2;
     public Bitmap tunerBitmap;
+    public Bitmap tunerBitmapOutput;
     public Canvas tunerCanvas;
+    public Canvas tunerOutputCanvas;
     public Paint tunerPaint;
     public int centerPoint;
     public int screenWidth;
+    public BitmapDrawable backgroundDrawble;
+    public Bitmap backgroundBitmap;
+    public Resources resources;
     //
 
     //AudioAnalysisResult audioAnalysisResult;
@@ -56,15 +66,20 @@ public class TunerViewer implements Runnable {
         imageView.setImageBitmap(bitmapOutput);
 
         //
-        screenWidth = view.getWidth();
+        screenWidth = ContextManager.getScreenSize().x;
         centerPoint = screenWidth/2;
         imageView2 = view.findViewById(R.id.imageView2);
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
+        tunerBitmapOutput = Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
+        tunerOutputCanvas = new Canvas(tunerBitmapOutput);
         tunerPaint = new Paint();
-        tunerPaint.setColor(Color.YELLOW);
-        imageView2.setImageBitmap(tunerBitmap);
-        //
+        tunerPaint.setColor(Color.BLACK);
+        tunerPaint.setTextSize(30);
+        imageView2.setImageBitmap(tunerBitmapOutput);
+        resources =  ContextManager.getContext().getResources();
+        backgroundDrawble = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency,null);
+        backgroundBitmap = backgroundDrawble.getBitmap();
     }
 
 
@@ -110,8 +125,19 @@ public class TunerViewer implements Runnable {
     }
 
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
+        int scale = scaleConvertResult.scale;
+        String scaleWord = ScaleConverter.scaleWordList[scale];
+        String errorFrequency = scaleConvertResult.erroFrequency+"";
+        float frequency = scaleConvertResult.frequency;
+        Log.d("scaleWord", "scaleWord: "+scaleWord);
+        tunerCanvas.drawColor(Color.WHITE);
+        tunerCanvas.drawBitmap(backgroundBitmap,0,0,null);
+        tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 10 , tunerPaint );
+        tunerCanvas.drawText(scaleWord,centerPoint,150,tunerPaint);
 
-        canvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 5 , tunerPaint );
+        tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
+
+        imageView2.invalidate();
     }
 
 }
