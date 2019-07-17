@@ -25,6 +25,7 @@ public class MetronomeFragment extends Fragment {
     TimerTask task;
     Timer timer;
     Button start, stop;
+    double timeValue = 0.1666666666666667;
     int bpm = 10;
     int tempo = 2;
     int i = 0;
@@ -62,7 +63,6 @@ public class MetronomeFragment extends Fragment {
                 picker_denominator.setMaxValue(5);
                 picker_denominator.setDisplayedValues(new String[]{"2", "4", "8", "2", "4", "8"});
                 picker_denominator.setValue(0);
-                tempo = Integer.parseInt(picker_denominator.getDisplayedValues()[picker_denominator.getValue()]);
 
                 //tempPopup 이벤트
                 Button tempoPopupEvent = tempView.findViewById(R.id.CANCLE);
@@ -78,8 +78,10 @@ public class MetronomeFragment extends Fragment {
                     // 확인 이벤트
                     @Override
                     public void onClick(View v) {
+                        tempo = Integer.parseInt(picker_denominator.getDisplayedValues()[picker_denominator.getValue()]);
+                        timeValue = tempoBPM.tempView(bpm, tempo);
                         tempoView.setText(picker_molecule.getDisplayedValues()[picker_molecule.getValue()] + " / " + tempo);
-                        valueText.setText(String.valueOf(tempoBPM.tempView(bpm, tempo)));
+                        valueText.setText(String.valueOf(timeValue));
                         tempoPopup.dismiss();
                     }
                 });
@@ -99,7 +101,8 @@ public class MetronomeFragment extends Fragment {
             //드래그를 멈추면 발생하는 이벤트
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 bpm = progress+10;
-                valueText.setText(String.valueOf(tempoBPM.tempView(bpm, tempo)));
+                timeValue = tempoBPM.tempView(bpm, tempo);
+                valueText.setText(String.valueOf(timeValue));
                 bpmView.setText(tempoBPM.bpmView(bpm));
                 bpmText.setText(String.valueOf(bpm));
             }
@@ -111,7 +114,7 @@ public class MetronomeFragment extends Fragment {
             public void onClick(View v) {
                 task = timerTask();
                 timer = new Timer();
-                timer.schedule(task, 1, 1000);
+                timer.schedule(task, 1, (int)(timeValue * 1000));
             }
         });
 
