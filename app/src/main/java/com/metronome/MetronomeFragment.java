@@ -1,6 +1,7 @@
 package com.metronome;
 
 import androidx.fragment.app.Fragment;
+
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,29 +15,24 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.metronome.util.TempoBPM;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import com.metronome.util.TimerState;
 
 public class MetronomeFragment extends Fragment {
     private PopupWindow tempoPopup;
+    TimerState timer;
+    TempoBPM tempoBPM = new TempoBPM();
     NumberPicker picker_molecule, picker_denominator;
-    TextView timeView, bpmText, tempoView, bpmView, valueText;
-    TimerTask task;
-    Timer timer;
+    TextView bpmText, tempoView, bpmView, valueText;
     Button start, stop;
     double timeValue = 0.1666666666666667;
     int bpm = 10;
     int molecule = 1;
     int denominator = 2;
-    int i = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_metronome, null);
         SeekBar seekBar = view.findViewById(R.id.BPMSeekBar);
-        final TempoBPM tempoBPM = new TempoBPM();
-        timeView = view.findViewById(R.id.clickOutput);
         valueText = view.findViewById(R.id.valueText);
         tempoView = view.findViewById(R.id.tempoView);
         bpmView = view.findViewById(R.id.bpmView);
@@ -114,9 +110,8 @@ public class MetronomeFragment extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                task = timerTask();
-                timer = new Timer();
-                timer.schedule(task, 1, (int)(timeValue * 1000));
+                timer = new TimerState();
+                timer.start(molecule, timeValue);
             }
         });
 
@@ -124,28 +119,10 @@ public class MetronomeFragment extends Fragment {
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                task.cancel();
-                task.scheduledExecutionTime();
-                timer.purge();
+                timer.stop();
+                timer = null;
             }
         });
         return view;
-    }
-
-//타이머 메소드
-public TimerTask timerTask() {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                if(i == 1 || (double)(i%molecule) == 0) {
-                    i++;
-                    timeView.setText("삡");
-                }
-                else {
-                    timeView.setText(String.valueOf(i++));
-                }
-            }
-        };
-        return task;
     }
 }

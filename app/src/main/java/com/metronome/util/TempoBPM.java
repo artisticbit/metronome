@@ -1,8 +1,7 @@
 package com.metronome.util;
 
-import android.util.Log;
-
 public class TempoBPM {
+
     public double tempView(double bpm, double tempo) {
         return (bpm/60) * (tempo/4);
     }
