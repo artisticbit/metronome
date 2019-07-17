@@ -111,7 +111,7 @@ public class MetronomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 timer = new TimerState();
-                timer.start(molecule, timeValue);
+                timer.start(molecule, 1/timeValue);
             }
         });
 

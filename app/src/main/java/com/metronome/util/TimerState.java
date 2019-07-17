@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,11 +36,11 @@ public class TimerState {
             public void run() {
                 if (second == 1 || (double) (second % molecule) == 0) {
                     Log.e("timer log " + second, "+" );
-                    vibrator.vibrate(500);
+                    vibrator.vibrate(100);
                     second++;
                 } else {
                     Log.e("timer log " + second, "-");
-                    vibrator.vibrate(500);
+                    vibrator.vibrate(100);
                     second++;
                 }
             }
