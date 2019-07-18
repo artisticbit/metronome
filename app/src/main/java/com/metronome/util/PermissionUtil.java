@@ -29,22 +29,22 @@ public class PermissionUtil extends Activity{
         }
     }
 */
-    public boolean checkPermission(String permission,int permissionCode){
-        int permissionCheck = ContextCompat.checkSelfPermission(activity, permission);
+        public boolean checkPermission(String permission,int permissionCode){
+            int permissionCheck = ContextCompat.checkSelfPermission(activity, permission);
 
-        Log.d("test","permission :"+permissionCheck);
-        //RECORD_AUDIO 퍼미션없을경우 퍼미션 요청
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            //권한취소이력확인
-            if(activity.shouldShowRequestPermissionRationale(permission)){
-                activity.requestPermissions(new String[]{permission},permissionCode);
+            Log.d("test","permission :"+permissionCheck);
+            //RECORD_AUDIO 퍼미션없을경우 퍼미션 요청
+            if(permissionCheck== PackageManager.PERMISSION_DENIED){
+                //권한취소이력확인
+                if(activity.shouldShowRequestPermissionRationale(permission)){
+                    activity.requestPermissions(new String[]{permission},permissionCode);
+                }else{
+                    //권한요청
+                    activity.requestPermissions(new String[]{permission},permissionCode);
+                }
             }else{
-                //권한요청
-                activity.requestPermissions(new String[]{permission},permissionCode);
+                return true;
             }
-        }else{
-            return true;
-        }
 
         return false;
     }

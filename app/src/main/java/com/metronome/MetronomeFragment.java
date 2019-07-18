@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.metronome.util.TempoBPM;
@@ -23,6 +24,7 @@ public class MetronomeFragment extends Fragment {
     TempoBPM tempoBPM = new TempoBPM();
     NumberPicker picker_molecule, picker_denominator;
     TextView bpmText, tempoView, bpmView, valueText;
+    Switch soundSwitch, vibrationSwitch, lightSwitch;
     Button start, stop;
     double timeValue = 0.1666666666666667;
     int bpm = 10;
@@ -33,6 +35,9 @@ public class MetronomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_metronome, null);
         SeekBar seekBar = view.findViewById(R.id.BPMSeekBar);
+        soundSwitch = view.findViewById(R.id.soundSwitch);
+        vibrationSwitch = view.findViewById(R.id.vibrationSwitch);
+        lightSwitch = view.findViewById(R.id.lightSwitch);
         valueText = view.findViewById(R.id.valueText);
         tempoView = view.findViewById(R.id.tempoView);
         bpmView = view.findViewById(R.id.bpmView);
@@ -111,7 +116,7 @@ public class MetronomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 timer = new TimerState();
-                timer.start(molecule, 1/timeValue);
+                timer.start(molecule, 1/timeValue, soundSwitch.isChecked(), vibrationSwitch.isChecked(), lightSwitch.isChecked());
             }
         });
 
@@ -123,6 +128,7 @@ public class MetronomeFragment extends Fragment {
                 timer = null;
             }
         });
+
         return view;
     }
 }
