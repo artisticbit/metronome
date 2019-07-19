@@ -9,8 +9,10 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.os.Message;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.metronome.R;
@@ -21,7 +23,7 @@ import com.metronome.util.domain.ScaleConvertResult;
 
 import java.util.Random;
 
-public class TunerViewer implements Runnable {
+public class TunerViewer {
 
     private View view;
 
@@ -36,6 +38,7 @@ public class TunerViewer implements Runnable {
     public Paint paint;
     public Paint paint2;
     //
+    public FrameLayout tunerViewFrame;
     //
     public ImageView imageView2;
     public Bitmap tunerBitmap;
@@ -43,20 +46,19 @@ public class TunerViewer implements Runnable {
     public Canvas tunerCanvas;
     public Canvas tunerOutputCanvas;
     public Paint tunerPaint;
-    public int centerPoint;
+    public int centerPointX;
+    public int centerPointY;
     public int screenWidth;
-    public BitmapDrawable backgroundDrawble;
-    public Bitmap backgroundBitmap;
-    public Bitmap backgroundBitmapResize;
-    public Resources resources;
-    public float density;
     //
+    public float density;
+    public int frameHeight;
+    //
+
 
     //AudioAnalysisResult audioAnalysisResult;
 
     public TunerViewer(View view){
         this.view = view;
-        thread = new Thread(this);
 
         imageView = view.findViewById(R.id.imageView);
         bitmap = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
@@ -72,7 +74,12 @@ public class TunerViewer implements Runnable {
 
         //
         screenWidth = ContextManager.getScreenSize().x;
-        centerPoint = screenWidth/2;
+        density = ContextManager.getDensity();
+        frameHeight = (int)(150*density+0.5);
+
+        centerPointX = screenWidth/2;
+        centerPointY = frameHeight/2;
+        //
         imageView2 = view.findViewById(R.id.imageView2);
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
         tunerBitmapOutput = Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
@@ -85,34 +92,13 @@ public class TunerViewer implements Runnable {
         imageView2.setImageBitmap(tunerBitmapOutput);
         //imageView2.setImageBitmap(tunerBitmap); // 더블버퍼링해제
 
-        //배경 비트맵 초기화 , 사이즈조절
+
+        Log.d("test", "frameHeight: "+frameHeight);
 
 
-        //initDraw();
+
     }
 
-    public void initDraw(){
-        //첫화면시 튜너 배경화면 설정
-        tunerOutputCanvas.drawBitmap(backgroundBitmap,0,0,null);
-        imageView2.invalidate();
-        //imageView2.setImageDrawable(backgroundDrawble);
-    }
-
-    public void drawPitchView(Message msg){
-        //audioAnalysisResult = (AudioAnalysisResult) msg.obj;
-    }
-
-    @Override
-    public void run() {
-        Log.d("test", "tunerViewer Thread start!!!! ");
-       /*
-        switch (mode){
-            case 1:
-                drawPitchView();
-                break;
-        }
-        */
-    }
 
     public void drawPitchView(AudioAnalysisResult audioAnalysisResult){
         double[] fftOutput = audioAnalysisResult.fftResult;
@@ -139,12 +125,15 @@ public class TunerViewer implements Runnable {
         imageView.invalidate();
     }
 
+    int scale=0;
+    String scaleWord="";
+    String errorFrequency="";
+    float frequency =0;
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
-        int scale = scaleConvertResult.scale;
-        String scaleWord = ScaleConverter.scaleWordList[scale];
-        String errorFrequency = scaleConvertResult.erroFrequency+"";
-        float frequency = scaleConvertResult.frequency;
-        Log.d("scaleWord", "scaleWord: "+scaleWord);
+        scale = scaleConvertResult.scale;
+        scaleWord = ScaleConverter.scaleWordList[scale];
+        errorFrequency = scaleConvertResult.erroFrequency+"";
+        frequency = scaleConvertResult.frequency;
 
         //비트맵 초기화
         imageView2.setImageBitmap(null);
@@ -153,17 +142,19 @@ public class TunerViewer implements Runnable {
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
         tunerCanvas.drawColor(Color.argb(0,0,0,0));
+        //해상도 테스트
+        tunerCanvas.drawCircle(centerPointX , centerPointY , 10 , tunerPaint );
+        tunerCanvas.drawCircle(centerPointX , frameHeight , 10 , tunerPaint );
         //
-
-        tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 10 , tunerPaint );
-        tunerCanvas.drawText(scaleWord,centerPoint,150,tunerPaint);
+        tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
+        tunerCanvas.drawText(scaleWord,centerPointX,150,tunerPaint);
 
         tunerCanvas.drawCircle(0,0,10,tunerPaint);
         tunerCanvas.drawCircle(screenWidth,0,10,tunerPaint);
 
         tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
 
-        //테스트용 실패 메인쓰레드가 아니면 안됨
+
         imageView2.setImageBitmap(tunerBitmap);
         imageView2.invalidate();
     }

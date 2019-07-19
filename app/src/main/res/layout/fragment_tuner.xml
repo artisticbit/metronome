@@ -26,13 +26,14 @@
         android:src="@color/colorAccent" />
 
     <FrameLayout
+        android:id="@+id/tunerViewFrame"
         android:layout_width="match_parent"
         android:layout_height="150dp">
 
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:src="@drawable/bg_tuner_frequency"
             app:srcCompat="@drawable/bg_tuner_frequency" />
 
@@ -40,7 +41,7 @@
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#00FFFFFF"
+            android:background="@android:color/transparent"
             android:contentDescription="Description"
             android:src="@android:color/background_dark" />
     </FrameLayout>
