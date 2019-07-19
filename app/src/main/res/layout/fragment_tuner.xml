@@ -30,12 +30,19 @@
         android:layout_height="150dp">
 
         <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bg_tuner_frequency"
+            app:srcCompat="@drawable/bg_tuner_frequency" />
+
+        <ImageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#00FFFFFF"
             android:contentDescription="Description"
-            android:src="@android:color/background_dark"
-            app:srcCompat="@drawable/bg_tuner_frequency" />
+            android:src="@android:color/background_dark" />
     </FrameLayout>
 
 </LinearLayout>

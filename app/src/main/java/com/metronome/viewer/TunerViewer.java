@@ -19,6 +19,8 @@ import com.metronome.util.ScaleConverter;
 import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.domain.ScaleConvertResult;
 
+import java.util.Random;
+
 public class TunerViewer implements Runnable {
 
     private View view;
@@ -82,13 +84,15 @@ public class TunerViewer implements Runnable {
         tunerPaint = new Paint();
         tunerPaint.setColor(Color.BLACK);
         tunerPaint.setTextSize(30);
+
         imageView2.setImageBitmap(tunerBitmapOutput);
+        //imageView2.setImageBitmap(tunerBitmap); // 더블버퍼링해제
 
         //배경 비트맵 초기화 , 사이즈조절
         int viewWidth = imageView2.getMeasuredWidth();
         int viewHeight = imageView2.getMeasuredHeight();
         resources =  ContextManager.getContext().getResources();
-        backgroundDrawble = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency_500);
+        backgroundDrawble = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency);
         backgroundBitmap = backgroundDrawble.getBitmap();
 
 
@@ -106,7 +110,7 @@ public class TunerViewer implements Runnable {
         backgroundDrawble500 = (BitmapDrawable)resources.getDrawable(R.drawable.bg_tuner_frequency_500,null);
 
 
-        initDraw();
+        //initDraw();
     }
 
     public void initDraw(){
@@ -163,10 +167,14 @@ public class TunerViewer implements Runnable {
         String errorFrequency = scaleConvertResult.erroFrequency+"";
         float frequency = scaleConvertResult.frequency;
         Log.d("scaleWord", "scaleWord: "+scaleWord);
-        tunerCanvas.drawColor(Color.WHITE);
-        //tunerCanvas.drawBitmap(backgroundBitmapResize,0,0,null);
-        tunerCanvas.drawBitmap(backgroundBitmap,0,0,null);
-        //imageView2.setImageDrawable(backgroundDrawble);    //테스트용
+
+        imageView2.setImageBitmap(null);
+        imageView2.invalidate();
+
+        tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
+        tunerCanvas = new Canvas(tunerBitmap);
+        tunerCanvas.drawColor(Color.argb(0,0,0,0));
+
         tunerCanvas.drawCircle(centerPoint + scaleConvertResult.erroFrequency, 100 , 10 , tunerPaint );
         tunerCanvas.drawText(scaleWord,centerPoint,150,tunerPaint);
 
@@ -176,7 +184,7 @@ public class TunerViewer implements Runnable {
         tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
 
 
-        //imageView2.setImageBitmap(tunerBitmapOutput); //테스트용 실패 메인쓰레드가 아니면 안됨
+        imageView2.setImageBitmap(tunerBitmap); //테스트용 실패 메인쓰레드가 아니면 안됨
         imageView2.invalidate();
     }
 

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import com.metronome.util.AudioUtil;
 import com.metronome.util.PermissionUtil;
 import com.metronome.util.domain.AudioAnalysisResult;
+import com.metronome.util.domain.ScaleConvertResult;
 import com.metronome.viewer.TunerViewer;
 
 
@@ -69,6 +70,7 @@ public class TunerFragment extends Fragment {
                         //tunerViewer.drawPitchView(msg);
                         break;
                     case 1:
+                        tunerViewer.drawTunerResult((ScaleConvertResult) msg.obj);
                         break;
                 }
             }

@@ -153,19 +153,26 @@ public class AudioUtil implements Runnable{
                    }
 
                    audioAnalysisResult.fftResult = toTransform;
-                   tunerViewer.drawPitchView(audioAnalysisResult);
 
-                   tunerViewer.drawTunerResult(scaleConvertResult);
+                   //메인스레드로 이관
+                   //tunerViewer.drawPitchView(audioAnalysisResult);
+                   //tunerViewer.drawTunerResult(scaleConvertResult);
+                   //
                    //Log.d("test", "run: "+toTransform[0]);
 
 
                     //핸들러쪽으로 메시지전송
-                   /*
+
                    Message msg = new Message();
                    msg.obj=audioAnalysisResult;
                    msg.what=0;
                    handler.sendMessage(msg);
-                   */
+
+                   msg = new Message();
+                   msg.obj=scaleConvertResult;
+                   msg.what=1;
+                   handler.sendMessage(msg);
+
                }
                 break;
             case AUDIO_MODE_RECORD:
