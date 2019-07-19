@@ -22,4 +22,10 @@ public class ContextManager {
         size.y = displayMetrics.heightPixels;
         return size;
     }
+
+    public static float getDensity(){
+        DisplayMetrics displayMetrics = context.getApplicationContext().getResources().getDisplayMetrics();
+
+        return displayMetrics.density;
+    }
 }
