@@ -11,7 +11,7 @@ import static com.metronome.util.ContextManager.getContext;
 
 public class TimerState {
     private Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-    LightControl lightControl = new LightControl();
+    LightSound lightControl = new LightSound();
     private TimerTask task;
     private Timer timer;
     int second = 1;
@@ -43,13 +43,13 @@ public class TimerState {
                     Log.e("timer log " + second, "+");
                     if(sound) { }
                     if(vibration) { vibrator.vibrate(300); }
-                    if(light) { lightControl.streakLight(getContext()); }
+                    if(light) { lightControl.streakLight( getContext()); }
                     second++;
                 } else {
                     Log.e("timer log " + second, "-");
                     if(sound) { }
                     if(vibration) { vibrator.vibrate(100); }
-                    if(light) { lightControl.streakLight(getContext()); }
+                    if(light) { lightControl.light( getContext()); }
                     second++;
                 }
             }
