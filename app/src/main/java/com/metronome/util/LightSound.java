@@ -12,14 +12,15 @@ import static android.content.Context.CAMERA_SERVICE;
 
 public class LightSound {
     private CameraManager mCameraManager;
-    private String mCameraId;
+    private String cameraId;
 
     // 라이트 이벤트
     public void light(Context context) {
         if(streakLight(context)) {
             try {
-                mCameraManager.setTorchMode(mCameraId, true);
-                //mCameraManager.setTorchMode(mCameraId, false);
+                cameraId = mCameraManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
+                mCameraManager.setTorchMode(cameraId, true);
+                mCameraManager.setTorchMode(cameraId, false);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
                 Toast.makeText(context.getApplicationContext(), "Not Found Flash 1", Toast.LENGTH_LONG).show();
@@ -31,14 +32,14 @@ public class LightSound {
     }
 
     public boolean streakLight(final Context context) {
-        mCameraManager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
-        if (mCameraId == null) {
+        mCameraManager = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
+        if (cameraId == null) {
             try {
                 for (final String id : mCameraManager.getCameraIdList()) {
                     CameraCharacteristics c = mCameraManager.getCameraCharacteristics(id);
                     int lensFacing = c.get(CameraCharacteristics.LENS_FACING);
                     if (lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
-                        mCameraId = id;
+                        cameraId = id;
                         return true;
                     }
                 }

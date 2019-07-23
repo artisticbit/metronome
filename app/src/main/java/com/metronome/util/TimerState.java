@@ -43,7 +43,7 @@ public class TimerState {
                     Log.e("timer log " + second, "+");
                     if(sound) { }
                     if(vibration) { vibrator.vibrate(300); }
-                    if(light) { lightControl.streakLight( getContext()); }
+                    if(light) { lightControl.light( getContext()); }
                     second++;
                 } else {
                     Log.e("timer log " + second, "-");
