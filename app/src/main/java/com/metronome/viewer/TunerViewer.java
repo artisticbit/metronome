@@ -53,6 +53,7 @@ public class TunerViewer {
     public float density;
     public int frameHeight;
     //
+    public ImageView imageViewBg;
 
 
     //AudioAnalysisResult audioAnalysisResult;
@@ -92,6 +93,10 @@ public class TunerViewer {
         imageView2.setImageBitmap(tunerBitmapOutput);
         //imageView2.setImageBitmap(tunerBitmap); // 더블버퍼링해제
 
+        imageViewBg = view.findViewById(R.id.imageViewBg);
+        imageViewBg.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.AT_MOST);
+
+        Log.d("test", "TunerViewer: ");
 
         Log.d("test", "frameHeight: "+frameHeight);
 

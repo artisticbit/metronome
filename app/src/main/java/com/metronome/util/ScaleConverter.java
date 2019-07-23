@@ -6,6 +6,9 @@ public class ScaleConverter {
 
     public float[][] scaleMatrix;
     public static String[] scaleWordList={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+    public  boolean staticScaleMode = false;
+    public  int staticOctave;
+    public int staticScale;
 
     public ScaleConverter(){
         scaleMatrix= new float[9][12];
@@ -25,6 +28,16 @@ public class ScaleConverter {
         }
     }
 
+    public void setStaticScaleMode(boolean mode){
+        this.staticScaleMode = mode;
+    }
+
+    public void setStaticScale(int octave, int scale ){
+        this.staticOctave = octave;
+        this.staticScale = scale;
+    }
+
+
     public ScaleConvertResult getScale(float frequency){
         ScaleConvertResult scaleConvertResult = new ScaleConvertResult();
         int octave = 0;
@@ -32,6 +45,18 @@ public class ScaleConverter {
         float errorFrequency = 0;
         String scaleWord="";
 
+        //고정 음계 탐색모드
+        //세팅 된 음계와 현재 주파수 비교
+        if(staticScaleMode){
+            scaleConvertResult.frequency = frequency;
+            scaleConvertResult.octave = staticOctave;
+            scaleConvertResult.scale = staticScale;
+
+            float targetFrequency = scaleMatrix[octave][scale];
+            scaleConvertResult.erroFrequency = frequency - targetFrequency;
+
+            return scaleConvertResult;
+        }
         //옥타브 계산
         for( int i=1; i < scaleMatrix.length; i++ ){
             if( frequency < scaleMatrix[i][0] ){
@@ -75,7 +100,7 @@ public class ScaleConverter {
         scaleConvertResult.frequency= frequency;
         scaleConvertResult.octave = octave;
         scaleConvertResult.scale = scale;
-        scaleConvertResult.scaleWord = scaleWord;
+        //scaleConvertResult.scaleWord = scaleWord;
         scaleConvertResult.erroFrequency = errorFrequency;
         return scaleConvertResult;
     }
