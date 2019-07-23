@@ -45,7 +45,7 @@ public class MetronomeFragment extends Fragment {
         start = view.findViewById(R.id.start);
         stop = view.findViewById(R.id.stop);
 
-        //tempo button 이벤트
+        //tempo button Event
         Button popup = view.findViewById(R.id.tempBtn);
         popup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +56,7 @@ public class MetronomeFragment extends Fragment {
                 picker_molecule = tempView.findViewById(R.id.picker_molecule);
                 picker_denominator = tempView.findViewById(R.id.picker_denominator);
 
-                //NumberPicker molecule / denominator 설정
+                //NumberPicker molecule / denominator sStting
                 picker_molecule.setMinValue(0);
                 picker_molecule.setMaxValue(11);
                 picker_molecule.setDisplayedValues(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"});
@@ -66,7 +66,7 @@ public class MetronomeFragment extends Fragment {
                 picker_denominator.setDisplayedValues(new String[]{"2", "4", "8", "2", "4", "8"});
                 picker_denominator.setValue(0);
 
-                //tempPopup 이벤트
+                //tempPopup Event
                 Button tempoPopupEvent = tempView.findViewById(R.id.CANCLE);
                 tempoPopupEvent.setOnClickListener(new View.OnClickListener() {
                     // 취소 이벤트
@@ -91,17 +91,17 @@ public class MetronomeFragment extends Fragment {
             }
         });
 
-        //SeekBar 이벤트
+        //SeekBar Event
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            //처음에 발생하는 이벤트
+            //First Event
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
 
-            //탭하는 순간 발생하는 이벤트
+            //Tab Event
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
 
-            //드래그를 멈추면 발생하는 이벤트
+            //Drag Stop Event
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 bpm = progress+10;
                 timeValue = tempoBPM.tempView(bpm, denominator);
@@ -111,7 +111,7 @@ public class MetronomeFragment extends Fragment {
             }
         });
 
-        //Start 버튼 이벤트
+        //Start Button Event
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +120,7 @@ public class MetronomeFragment extends Fragment {
             }
         });
 
-        //Stop 버튼 이벤트
+        //Stop Button Event
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

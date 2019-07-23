@@ -1,27 +1,27 @@
 package com.metronome.util;
 
 import android.content.Context;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.os.Handler;
-import android.os.Looper;
+        import android.hardware.camera2.CameraAccessException;
+        import android.hardware.camera2.CameraManager;
+import android.media.MediaPlayer;
 import android.widget.Toast;
 
-import static android.content.Context.CAMERA_SERVICE;
+import com.metronome.R;
 
-public class LightSound {
+public class FlashSound {
     private CameraManager mCameraManager;
+    private MediaPlayer mp;
     private String cameraId;
     private Context context;
 
-    public LightSound(Context context) {
+    public FlashSound(Context context) {
         this.context = context;
         mCameraManager = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
+        mp = MediaPlayer.create(context, R.raw.sound);
     }
 
-    // 라이트 이벤트
-    public void light() {
+    // Flash Event
+    public void flash() {
         try {
             cameraId = mCameraManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
             mCameraManager.setTorchMode(cameraId, true);
@@ -30,5 +30,11 @@ public class LightSound {
             e.printStackTrace();
             Toast.makeText(context.getApplicationContext(), "Not Found Flash", Toast.LENGTH_LONG).show();
         }
+    }
+
+    // Sound Event
+    public void sound() {
+        mp.start();
+        mp.stop();
     }
 }
