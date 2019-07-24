@@ -1,8 +1,8 @@
 package com.metronome.util;
 
 import android.content.Context;
-        import android.hardware.camera2.CameraAccessException;
-        import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.media.MediaPlayer;
 import android.widget.Toast;
 
@@ -10,14 +10,15 @@ import com.metronome.R;
 
 public class FlashSound {
     private CameraManager mCameraManager;
-    private MediaPlayer mp;
+    private MediaPlayer mFirstSound, mMiddleSound;
     private String cameraId;
     private Context context;
 
     public FlashSound(Context context) {
         this.context = context;
         mCameraManager = (CameraManager) context.getSystemService(context.CAMERA_SERVICE);
-        mp = MediaPlayer.create(context, R.raw.sound);
+        mFirstSound = MediaPlayer.create(context, R.raw.firstsound);
+        mMiddleSound = MediaPlayer.create(context, R.raw.middlesound);
     }
 
     // Flash Event
@@ -32,9 +33,17 @@ public class FlashSound {
         }
     }
 
-    // Sound Event
-    public void sound() {
-        mp.start();
-        mp.stop();
+    // First Sound Event (Pipe)
+    public void firstSound() {
+        mFirstSound = MediaPlayer.create(context, R.raw.firstsound);
+        mFirstSound.start();
+        mFirstSound.stop();
+    }
+
+    // Middle Sound Event
+    public void middleSound() {
+        mMiddleSound = MediaPlayer.create(context, R.raw.middlesound);
+        mMiddleSound.start();
+        mMiddleSound.stop();
     }
 }

@@ -41,13 +41,13 @@ public class TimerState {
             public void run() {
                 if (second == 1 || (double) (second % molecule) == 0) {
                     Log.e("timer log " + second, "+");
-                    if(sound) { flashSound.sound(); }
+                    if(sound) { flashSound.firstSound(); }
                     if(vibration) { vibrator.vibrate(300); }
                     if(light) { flashSound.flash(); }
                     second++;
                 } else {
                     Log.e("timer log " + second, "-");
-                    if(sound) { flashSound.sound(); }
+                    if(sound) { flashSound.middleSound(); }
                     if(vibration) { vibrator.vibrate(100); }
                     if(light) { flashSound.flash(); }
                     second++;

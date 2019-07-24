@@ -14,27 +14,30 @@ import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.metronome.util.TempoBPM;
 import com.metronome.util.TimerState;
 
 public class MetronomeFragment extends Fragment {
     private PopupWindow tempoPopup;
-    TimerState timer;
-    TempoBPM tempoBPM = new TempoBPM();
-    NumberPicker picker_molecule, picker_denominator;
-    TextView bpmText, tempoView, bpmView, valueText;
-    Switch soundSwitch, vibrationSwitch, lightSwitch;
-    Button start, stop;
-    double timeValue = 0.1666666666666667;
-    int bpm = 10;
-    int molecule = 1;
-    int denominator = 2;
+    private TimerState timer;
+    private SeekBar seekBar;
+    private TempoBPM tempoBPM = new TempoBPM();
+    private NumberPicker picker_molecule, picker_denominator;
+    private TextView bpmText, tempoView, bpmView, valueText;
+    private Switch soundSwitch, vibrationSwitch, lightSwitch;
+    private Boolean state = false;
+    private Button start, stop, popup;
+    private double timeValue = 0.1666666666666667;
+    private int bpm = 10;
+    private int molecule = 1;
+    private int denominator = 2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_metronome, null);
-        SeekBar seekBar = view.findViewById(R.id.BPMSeekBar);
+        seekBar = view.findViewById(R.id.BPMSeekBar);
         soundSwitch = view.findViewById(R.id.soundSwitch);
         vibrationSwitch = view.findViewById(R.id.vibrationSwitch);
         lightSwitch = view.findViewById(R.id.lightSwitch);
@@ -46,7 +49,7 @@ public class MetronomeFragment extends Fragment {
         stop = view.findViewById(R.id.stop);
 
         //tempo button Event
-        Button popup = view.findViewById(R.id.tempBtn);
+        popup = view.findViewById(R.id.tempBtn);
         popup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,7 +59,7 @@ public class MetronomeFragment extends Fragment {
                 picker_molecule = tempView.findViewById(R.id.picker_molecule);
                 picker_denominator = tempView.findViewById(R.id.picker_denominator);
 
-                //NumberPicker molecule / denominator sStting
+                //NumberPicker molecule / denominator Setting
                 picker_molecule.setMinValue(0);
                 picker_molecule.setMaxValue(11);
                 picker_molecule.setDisplayedValues(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"});
@@ -115,8 +118,16 @@ public class MetronomeFragment extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer = new TimerState();
-                timer.start(molecule, 1/timeValue, soundSwitch.isChecked(), vibrationSwitch.isChecked(), lightSwitch.isChecked());
+                if(!state) {
+                    timer = new TimerState();
+                    timer.start(molecule, 1 / timeValue, soundSwitch.isChecked(), vibrationSwitch.isChecked(), lightSwitch.isChecked());
+                    popup.setEnabled(false);
+                    seekBar.setEnabled(false);
+                    state = true;
+                }
+                else {
+                    Toast.makeText(getContext().getApplicationContext(), "Stop Touch", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -124,11 +135,18 @@ public class MetronomeFragment extends Fragment {
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.stop();
-                timer = null;
+                if(state) {
+                    timer.stop();
+                    timer = null;
+                    popup.setEnabled(true);
+                    seekBar.setEnabled(true);
+                    state = false;
+                }
+                else {
+                    Toast.makeText(getContext().getApplicationContext(), "Start Touch", Toast.LENGTH_LONG).show();
+                }
             }
         });
-
         return view;
     }
 }
