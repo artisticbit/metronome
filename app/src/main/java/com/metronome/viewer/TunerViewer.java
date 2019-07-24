@@ -1,15 +1,9 @@
 package com.metronome.viewer;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
-import android.os.Message;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -49,21 +43,31 @@ public class TunerViewer {
     public int centerPointX;
     public int centerPointY;
     public int screenWidth;
+    public int redLineHalfHeight;
     //
     public float density;
     public int frameHeight;
     //
     public ImageView imageViewBg;
-
+    public int bgWidth;
+    public int bgHeight;
 
     //AudioAnalysisResult audioAnalysisResult;
 
     public TunerViewer(View view){
         this.view = view;
+    }
 
+    public void init(){
         imageView = view.findViewById(R.id.imageView);
-        bitmap = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
-        bitmapOutput = Bitmap.createBitmap((int)1024, (int)300, Bitmap.Config.ARGB_8888);
+
+        imageViewBg = view.findViewById(R.id.imageViewBg);
+        bgWidth = imageViewBg.getWidth();
+        bgHeight = imageViewBg.getHeight();
+        Log.d("test", "bg W: "+bgWidth + "H: "+bgHeight);
+
+        bitmap = Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
+        bitmapOutput = Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         canvasOutput = new Canvas(bitmapOutput);
         paint = new Paint();
@@ -78,8 +82,8 @@ public class TunerViewer {
         density = ContextManager.getDensity();
         frameHeight = (int)(150*density+0.5);
 
-        centerPointX = screenWidth/2;
-        centerPointY = frameHeight/2;
+        centerPointX = bgWidth/2;
+        centerPointY = bgHeight/2;
         //
         imageView2 = view.findViewById(R.id.imageView2);
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
@@ -93,17 +97,12 @@ public class TunerViewer {
         imageView2.setImageBitmap(tunerBitmapOutput);
         //imageView2.setImageBitmap(tunerBitmap); // 더블버퍼링해제
 
-        imageViewBg = view.findViewById(R.id.imageViewBg);
-        imageViewBg.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.AT_MOST);
+        redLineHalfHeight = bgHeight / 5;
 
-        Log.d("test", "TunerViewer: ");
+
 
         Log.d("test", "frameHeight: "+frameHeight);
-
-
-
     }
-
 
     public void drawPitchView(AudioAnalysisResult audioAnalysisResult){
         double[] fftOutput = audioAnalysisResult.fftResult;
@@ -147,10 +146,8 @@ public class TunerViewer {
         tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
         tunerCanvas.drawColor(Color.argb(0,0,0,0));
-        //해상도 테스트
-        tunerCanvas.drawCircle(centerPointX , centerPointY , 10 , tunerPaint );
-        tunerCanvas.drawCircle(centerPointX , frameHeight , 10 , tunerPaint );
-        //
+
+        
         tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
         tunerCanvas.drawText(scaleWord,centerPointX,150,tunerPaint);
 
