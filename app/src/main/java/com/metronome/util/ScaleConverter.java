@@ -51,6 +51,7 @@ public class ScaleConverter {
             scaleConvertResult.frequency = frequency;
             scaleConvertResult.octave = staticOctave;
             scaleConvertResult.scale = staticScale;
+            scaleConvertResult.isStaticMode = staticScaleMode;
 
             float targetFrequency = scaleMatrix[octave][scale];
             scaleConvertResult.erroFrequency = frequency - targetFrequency;

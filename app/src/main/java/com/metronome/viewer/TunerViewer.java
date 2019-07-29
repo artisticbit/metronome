@@ -147,7 +147,6 @@ public class TunerViewer {
         tunerCanvas = new Canvas(tunerBitmap);
         tunerCanvas.drawColor(Color.argb(0,0,0,0));
 
-        
         tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
         tunerCanvas.drawText(scaleWord,centerPointX,150,tunerPaint);
 
