@@ -6,17 +6,26 @@ public class ScaleConverter {
 
     public float[][] scaleMatrix;
     public static String[] scaleWordList={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+    //고정 음계 탐색모드 관련 변수
     public  boolean staticScaleMode = false;
     public  int staticOctave;
     public int staticScale;
+    public INSTRUMENT_MODE instrumentMode = INSTRUMENT_MODE.NONE;
+
+    public static enum INSTRUMENT_MODE {
+        NONE(0),GUITAR_CLASSIC(1),BASE(2);
+
+        private int value;
+        private INSTRUMENT_MODE(int value){
+            this.value = value;
+        }
+        public int getValue(){
+            return value;
+        }
+    }
 
     public ScaleConverter(){
         scaleMatrix= new float[9][12];
-        initScaleMatrix();
-    }
-
-    public ScaleConverter(int maxOctav ) {
-        scaleMatrix= new float[maxOctav][12];
         initScaleMatrix();
     }
 
@@ -52,6 +61,7 @@ public class ScaleConverter {
             scaleConvertResult.octave = staticOctave;
             scaleConvertResult.scale = staticScale;
             scaleConvertResult.isStaticMode = staticScaleMode;
+            scaleConvertResult.errorFrequencyMax = (float)(scaleMatrix[staticOctave][staticScale] * 0.056);
 
             float targetFrequency = scaleMatrix[octave][scale];
             scaleConvertResult.erroFrequency = frequency - targetFrequency;
@@ -103,6 +113,7 @@ public class ScaleConverter {
         scaleConvertResult.scale = scale;
         //scaleConvertResult.scaleWord = scaleWord;
         scaleConvertResult.erroFrequency = errorFrequency;
+        scaleConvertResult.errorFrequencyMax = (float)(scaleMatrix[octave][scale] * 0.056);
         return scaleConvertResult;
     }
 

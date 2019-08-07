@@ -11,6 +11,7 @@ public class ScaleConvertResult {
     public float upperError = 0;
     public float lowerError = 0;
     public boolean isStaticMode =false;
+    public float errorFrequencyMax = 0;
 
     public ScaleConvertResult(){
     }

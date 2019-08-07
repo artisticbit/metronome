@@ -184,4 +184,10 @@ public class AudioUtil implements Runnable{
         Log.d("test", "audioUtil Thread End!!!");
     }
 
+    public ScaleConverter.INSTRUMENT_MODE getCurrentInstrument(){
+        if(scaleConverter!=null){
+            return scaleConverter.instrumentMode;
+        }
+        return ScaleConverter.INSTRUMENT_MODE.NONE;
+    }
 }

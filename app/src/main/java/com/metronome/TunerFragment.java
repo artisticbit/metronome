@@ -2,6 +2,8 @@ package com.metronome;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -24,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.metronome.util.AudioUtil;
+import com.metronome.util.ContextManager;
 import com.metronome.util.PermissionUtil;
 import com.metronome.util.domain.AudioAnalysisResult;
 import com.metronome.util.domain.ScaleConvertResult;
@@ -47,7 +50,7 @@ public class TunerFragment extends Fragment {
     private BtnOnClickListener btnOnClickListener;
 
     private Button tunerStartBtn;
-
+    private Button instrumentMenuBtn;
 
     public TunerFragment() {
         // Required empty public constructor
@@ -89,7 +92,14 @@ public class TunerFragment extends Fragment {
         tunerStartBtn = view.findViewById(R.id.tunerStartBtn);
         tunerStartBtn.setOnClickListener(btnOnClickListener);
 
+        instrumentMenuBtn = view.findViewById(R.id.instrumentMenu);
+        instrumentMenuBtn.setOnClickListener(btnOnClickListener);
+
         tunerViewer = new TunerViewer(view);
+        //오디오 유틸 초기화
+        audioUtil = new AudioUtil(tunerViewer);
+        audioUtil.setHandler(handler);
+
         return view;
 
     }
@@ -99,6 +109,18 @@ public class TunerFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK){
+            switch (requestCode){
+                case 100:
+
+                    break;
+            }
+        }
     }
 
     //프래그먼트내 버튼클릭이벤트 정의
@@ -117,9 +139,16 @@ public class TunerFragment extends Fragment {
                        audioUtil.startAnalyze();
                    }
                 break;
+                   //악기모드 액티비티 열기
+                case R.id.instrumentMenu :
+                    Intent intent = new Intent(ContextManager.getContext(), InstrumentPopupActivity.class);
+                    intent.putExtra("currentInstrum",audioUtil.getCurrentInstrument().getValue());
+                    startActivityForResult(intent, 100);
+                    break;
             }
         }
     }
+
 
 
 }

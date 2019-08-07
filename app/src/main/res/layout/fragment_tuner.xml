@@ -47,4 +47,10 @@
             android:src="@android:color/background_dark" />
     </FrameLayout>
 
+    <Button
+        android:id="@+id/instrumentMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Menu" />
+
 </LinearLayout>

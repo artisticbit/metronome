@@ -31,6 +31,7 @@ public class TunerViewer {
     public Canvas canvasOutput;
     public Paint paint;
     public Paint paint2;
+    public Paint redLinePaint;
     //
     public FrameLayout tunerViewFrame;
     //
@@ -75,6 +76,8 @@ public class TunerViewer {
         paint2 = new Paint();
         paint2.setColor(Color.WHITE);
         paint2.setTextSize(30);
+        redLinePaint = new Paint();
+        redLinePaint.setColor(Color.RED);
         imageView.setImageBitmap(bitmapOutput);
 
         //
@@ -86,8 +89,8 @@ public class TunerViewer {
         centerPointY = bgHeight/2;
         //
         imageView2 = view.findViewById(R.id.imageView2);
-        tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
-        tunerBitmapOutput = Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
+        tunerBitmap =  Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
+        tunerBitmapOutput = Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
         tunerOutputCanvas = new Canvas(tunerBitmapOutput);
         tunerPaint = new Paint();
@@ -131,27 +134,31 @@ public class TunerViewer {
 
     int scale=0;
     String scaleWord="";
-    String errorFrequency="";
+    float errorFrequency = 0;
+    String errorFrequencyStr="";
     float frequency =0;
+    float errorFrequencyMax = 0;
+    float redLineX = 0;
     public void drawTunerResult(ScaleConvertResult scaleConvertResult){
         scale = scaleConvertResult.scale;
         scaleWord = ScaleConverter.scaleWordList[scale];
-        errorFrequency = scaleConvertResult.erroFrequency+"";
+        errorFrequency = scaleConvertResult.erroFrequency;
+        errorFrequencyStr = scaleConvertResult.erroFrequency+"";
         frequency = scaleConvertResult.frequency;
-
+        errorFrequencyMax = scaleConvertResult.errorFrequencyMax;
+        redLineX = centerPointX + (errorFrequency / errorFrequencyMax * bgWidth / 2);
+        Log.d("test", "errorFrequency: "+ errorFrequency + "max :" + errorFrequencyMax);
         //비트맵 초기화
         imageView2.setImageBitmap(null);
         imageView2.invalidate();
 
-        tunerBitmap =  Bitmap.createBitmap((int)screenWidth, (int)400, Bitmap.Config.ARGB_8888);
+        tunerBitmap =  Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
         tunerCanvas = new Canvas(tunerBitmap);
         tunerCanvas.drawColor(Color.argb(0,0,0,0));
 
         tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
-        tunerCanvas.drawText(scaleWord,centerPointX,150,tunerPaint);
-
-        tunerCanvas.drawCircle(0,0,10,tunerPaint);
-        tunerCanvas.drawCircle(screenWidth,0,10,tunerPaint);
+        tunerCanvas.drawLine(redLineX, 0, redLineX, bgHeight, redLinePaint);
+        tunerCanvas.drawText(scaleWord ,centerPointX,0,tunerPaint);
 
         tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
 
