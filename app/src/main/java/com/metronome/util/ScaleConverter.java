@@ -10,6 +10,7 @@ public class ScaleConverter {
     public  boolean staticScaleMode = false;
     public  int staticOctave;
     public int staticScale;
+    //악기모드  - 마지막 설정값 저장 및 불러오기 필요
     public INSTRUMENT_MODE instrumentMode = INSTRUMENT_MODE.NONE;
 
     public static enum INSTRUMENT_MODE {

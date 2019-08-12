@@ -152,7 +152,8 @@ public class AudioUtil implements Runnable{
 
                    }
 
-                   audioAnalysisResult.fftResult = toTransform;
+                   //fft 삭제예정
+                   //audioAnalysisResult.fftResult = toTransform;
 
                    //메인스레드로 이관
                    //tunerViewer.drawPitchView(audioAnalysisResult);
@@ -161,7 +162,7 @@ public class AudioUtil implements Runnable{
                    //Log.d("test", "run: "+toTransform[0]);
 
 
-                    //핸들러쪽으로 메시지전송
+                   //핸들러쪽으로 메시지전송
 
                    Message msg = new Message();
                    msg.obj=audioAnalysisResult;

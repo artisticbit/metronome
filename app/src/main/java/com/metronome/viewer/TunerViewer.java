@@ -67,6 +67,9 @@ public class TunerViewer {
         bgHeight = imageViewBg.getHeight();
         Log.d("test", "bg W: "+bgWidth + "H: "+bgHeight);
 
+
+        //fft 출력용 삭제예정
+        /*
         bitmap = Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
         bitmapOutput = Bitmap.createBitmap((int)bgWidth, (int)bgHeight, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
@@ -79,7 +82,7 @@ public class TunerViewer {
         redLinePaint = new Paint();
         redLinePaint.setColor(Color.RED);
         imageView.setImageBitmap(bitmapOutput);
-
+        */
         //
         screenWidth = ContextManager.getScreenSize().x;
         density = ContextManager.getDensity();
@@ -156,9 +159,9 @@ public class TunerViewer {
         tunerCanvas = new Canvas(tunerBitmap);
         tunerCanvas.drawColor(Color.argb(0,0,0,0));
 
-        tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
+        //tunerCanvas.drawCircle(centerPointX + scaleConvertResult.erroFrequency, centerPointY , 10 , tunerPaint );
         tunerCanvas.drawLine(redLineX, 0, redLineX, bgHeight, redLinePaint);
-        tunerCanvas.drawText(scaleWord ,centerPointX,0,tunerPaint);
+        tunerCanvas.drawText(scaleWord ,centerPointX,50,tunerPaint);
 
         tunerOutputCanvas.drawBitmap(tunerBitmap,0,0,null);
 
